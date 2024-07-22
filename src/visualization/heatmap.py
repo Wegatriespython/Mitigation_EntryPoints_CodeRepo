@@ -2,19 +2,29 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.patches import FancyArrowPatch
 import numpy as np
+import pandas as pd
+from typing import List, Tuple  # Import List and Tuple
 
-def create_heatmap(co_occurrence_data, clusters):
-    """Creates and customizes the heatmap figure and axes."""
-    fig = plt.figure(figsize=(24, 12))  # Create a Figure
-    gs = fig.add_gridspec(1, 2, width_ratios=[1, 3])  # Define a grid
+def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_palette=None) -> Tuple[plt.Figure, plt.Axes]:
+    """
+    Create a custom heatmap from co-occurrence data.
+    """
+    fig = plt.figure(figsize=(24, 12))
+    gs = fig.add_gridspec(1, 2, width_ratios=[1, 3])
 
-    legend_ax = fig.add_subplot(gs[0])  # Legend axis
-    heatmap_ax = fig.add_subplot(gs[1])  # Heatmap axis
+    legend_ax = fig.add_subplot(gs[0])
+    heatmap_ax = fig.add_subplot(gs[1])
 
     n_clusters = len(clusters)
-    base_colors = plt.cm.Set1(np.linspace(0, 1, 9))[:n_clusters]
-    cluster_cmaps = [LinearSegmentedColormap.from_list("", ["white", color]) for color in base_colors]
 
+    # Use specified color palette or default
+    if color_palette is not None:
+        base_colors = color_palette(np.linspace(0, 1, n_clusters))
+    else: 
+        base_colors = plt.cm.Set1(np.linspace(0, 1, 9))[:n_clusters]  # Default colormap
+
+    cluster_cmaps = [LinearSegmentedColormap.from_list("", ["white", color]) for color in base_colors]
+   
     max_co_occurrence = co_occurrence_data.applymap(
         lambda x: max(x) if isinstance(x, tuple) else 0
     ).values.max()
@@ -45,7 +55,7 @@ def create_heatmap(co_occurrence_data, clusters):
     heatmap_ax.set_yticks(np.arange(len(co_occurrence_data.index)) + 0.5)
     heatmap_ax.set_xticklabels(co_occurrence_data.columns, rotation=45, ha="right")
     heatmap_ax.set_yticklabels(co_occurrence_data.index)
-    heatmap_ax.set_title("Transport: Co-occurrence of Enablers and Entries for Unlocks", fontsize=16)
+    heatmap_ax.set_title("Co-occurrence of Enablers and Entries for Unlocks", fontsize=16)
     heatmap_ax.set_xlabel("Entries", fontsize=12)
     heatmap_ax.set_ylabel("Enablers", fontsize=12)
 
@@ -68,7 +78,7 @@ def create_heatmap(co_occurrence_data, clusters):
         legend_ax.scatter(pos, 0.75, s=size, c="gray", edgecolor="black")
 
     legend_ax.text(0.05, 0.5, "Color: Cluster", fontsize=10)
-    base_colors = plt.cm.Set1(np.linspace(0, 1, 9))[:len(clusters)]
+   
     for i, (cluster, color) in enumerate(zip(clusters, base_colors)):
         legend_ax.scatter(0.2, 0.4 - i * 0.1, s=100, c=[color], edgecolor="black")
         legend_ax.text(0.3, 0.4 - i * 0.1, cluster, fontsize=8, va="center")
@@ -81,7 +91,13 @@ def create_heatmap(co_occurrence_data, clusters):
     plt.tight_layout()
     plt.show()
 
-def create_and_save_heatmap(co_occurrence_data, clusters, output_file):
-    """Creates, customizes, and saves the heatmap."""
-    create_heatmap(co_occurrence_data, clusters)  
+def create_and_save_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], 
+                            title: str, color_palette=None) -> None:
+    """
+    Create, customize, and save the heatmap.
+    """
+    fig, heatmap_ax, legend_ax = create_heatmap(co_occurrence_data, clusters, color_palette) # Pass color_palette
+       
+    plt.tight_layout()
     plt.savefig(output_file, dpi=300, bbox_inches="tight")
+    plt.close(fig)
