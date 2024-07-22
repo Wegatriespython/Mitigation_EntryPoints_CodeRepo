@@ -3,7 +3,7 @@ from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.patches import FancyArrowPatch
 import numpy as np
 import pandas as pd
-from typing import List, Tuple  # Import List and Tuple
+from typing import List, Tuple
 
 def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_palette=None) -> Tuple[plt.Figure, plt.Axes]:
     """
@@ -25,17 +25,16 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
 
     cluster_cmaps = [LinearSegmentedColormap.from_list("", ["white", color]) for color in base_colors]
    
-    max_co_occurrence = co_occurrence_data.applymap(
-        lambda x: max(x) if isinstance(x, tuple) else 0
-    ).values.max()
+    max_co_occurrence = co_occurrence_data.max().max()
 
-    for i, enabler in enumerate(co_occurrence_data.index):
-        for j, entry in enumerate(co_occurrence_data.columns):
-            values = co_occurrence_data.loc[enabler, entry]
+    enablers = co_occurrence_data.index.get_level_values(0).unique()
+    entries = co_occurrence_data.index.get_level_values(1).unique()
+
+    for i, enabler in enumerate(enablers):
+        for j, entry in enumerate(entries):
+            values = co_occurrence_data.loc[(enabler, entry)].values
             if sum(v > 0 for v in values) >= 2:
-                heatmap_ax.add_patch(
-                    plt.Rectangle((j, i), 1, 1, fill=True, facecolor="lightgray", edgecolor="none")
-                )
+                heatmap_ax.add_patch(plt.Rectangle((j, i), 1, 1, fill=True, facecolor="lightgray", edgecolor="none"))
 
             for k, value in enumerate(values):
                 if value > 0:
@@ -51,10 +50,10 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
                         linewidth=0.5,
                     )
 
-    heatmap_ax.set_xticks(np.arange(len(co_occurrence_data.columns)) + 0.5)
-    heatmap_ax.set_yticks(np.arange(len(co_occurrence_data.index)) + 0.5)
-    heatmap_ax.set_xticklabels(co_occurrence_data.columns, rotation=45, ha="right")
-    heatmap_ax.set_yticklabels(co_occurrence_data.index)
+    heatmap_ax.set_xticks(np.arange(len(entries)) + 0.5)
+    heatmap_ax.set_yticks(np.arange(len(enablers)) + 0.5)
+    heatmap_ax.set_xticklabels(entries, rotation=45, ha="right")
+    heatmap_ax.set_yticklabels(enablers)
     heatmap_ax.set_title("Co-occurrence of Enablers and Entries for Unlocks", fontsize=16)
     heatmap_ax.set_xlabel("Entries", fontsize=12)
     heatmap_ax.set_ylabel("Enablers", fontsize=12)
@@ -86,16 +85,15 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
     legend_ax.set_xlim(0, 1)
     legend_ax.set_ylim(0, 1)
 
-
-
     plt.tight_layout()
-    plt.show()
+    return fig, heatmap_ax, legend_ax
 
 def create_and_save_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], 
                             title: str, color_palette=None) -> None:
     """
     Create, customize, and save the heatmap.
     """
-    fig, heatmap_ax, legend_ax = create_heatmap(co_occurrence_data, clusters, color_palette) # Pass color_palette
-       
-    plt.show()
+    fig, heatmap_ax, legend_ax = create_heatmap(co_occurrence_data, clusters, color_palette)
+    plt.savefig(title, dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Heatmap saved as {title}")

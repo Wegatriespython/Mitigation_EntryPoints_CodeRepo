@@ -1,74 +1,54 @@
 import pandas as pd
-import re
 import numpy as np
-from scipy.cluster import hierarchy
-from fuzzywuzzy import fuzz, process
+from src.data_processing.general_preprocessing import load_and_preprocess
 
-def calculate_co_occurrence(cluster_data, enablers, entries):
-    """Calculates the co-occurrence of enablers and entries for a specific cluster."""
-    co_occurrence_matrix = pd.DataFrame(0, index=enablers, columns=entries, dtype=int)
-    for _, row in cluster_data.iterrows():
-        row_enablers = row["Enabler"]
-        row_entries = row["Entry (policy intervention)"]
-        for enabler in row_enablers:
-            for entry in row_entries:
-                if enabler in co_occurrence_matrix.index and entry in co_occurrence_matrix.columns:
-                    co_occurrence_matrix.loc[enabler, entry] += 1
-    return co_occurrence_matrix
-
-def create_combined_matrix(df, enablers, entries):
-    """Creates a combined co-occurrence matrix with counts for each cluster as tuples."""
-    clusters = df["Cluster"].unique()
+def calculate_co_occurrence(df, vectorized_data, cluster_column):
+    enabler_matrix = vectorized_data['enabler_matrix']
+    entry_matrix = vectorized_data['entry_matrix']
+    clusters = df[cluster_column].unique()
+    
     co_occurrence_matrices = {}
     for cluster in clusters:
-        cluster_data = df[df["Cluster"] == cluster]
-        co_occurrence_matrices[cluster] = calculate_co_occurrence(cluster_data, enablers, entries)
+        cluster_mask = (df[cluster_column] == cluster).values
+        cluster_enablers = enabler_matrix[cluster_mask]
+        cluster_entries = entry_matrix[cluster_mask]
+        
+        co_occurrence = (cluster_enablers.T @ cluster_entries).tocsr()
+        co_occurrence_matrices[cluster] = co_occurrence
+    
+    return co_occurrence_matrices
 
-    all_enablers = list(set().union(*[cm.index for cm in co_occurrence_matrices.values()]))
-    combined_matrix = pd.DataFrame(index=all_enablers, columns=entries, dtype=object)
-    for enabler in all_enablers:
-        for entry in entries:
-            combined_matrix.loc[enabler, entry] = tuple(
-                cm.loc[enabler, entry] if enabler in cm.index else 0
-                for cm in co_occurrence_matrices.values()
-            )
-    return combined_matrix
+def prepare_heatmap_data(co_occurrence_matrices, vectorized_data, top_enablers, top_entries):
+    enabler_features = vectorized_data['enabler_features']
+    entry_features = vectorized_data['entry_features']
+    
+    # Get indices of top enablers and entries
+    top_enabler_indices = [np.where(enabler_features == e)[0][0] for e in top_enablers if e in enabler_features]
+    top_entry_indices = [np.where(entry_features == e)[0][0] for e in top_entries if e in entry_features]
+    
+    # Create the combined matrix
+    combined_matrix = np.zeros((len(top_enabler_indices), len(top_entry_indices), len(co_occurrence_matrices)))
+    
+    for i, (cluster, matrix) in enumerate(co_occurrence_matrices.items()):
+        submatrix = matrix[top_enabler_indices, :][:, top_entry_indices].toarray()
+        combined_matrix[:, :, i] = submatrix
+    
+    # Convert to pandas DataFrame
+    heatmap_data = pd.DataFrame(
+        data=[tuple(row) for row in combined_matrix.reshape(-1, len(co_occurrence_matrices))],
+        index=pd.MultiIndex.from_product([top_enablers, top_entries]),
+        columns=co_occurrence_matrices.keys()
+    )
+    
+    return heatmap_data
 
-def apply_fuzzy_matching_and_sorting(matrix, top_enablers, top_entries, feature_imp):
-    """Applies fuzzy matching, filtering, and sorting based on feature importance."""
-    feature_imp_dict = dict(zip(feature_imp["feature"], feature_imp["importance"]))
+def run_co_occurrence_analysis(file_path, enabler_column, entry_column, cluster_column, top_enablers, top_entries):
+    df, vectorized_data = load_and_preprocess(file_path, enabler_column, entry_column, cluster_column)
+    co_occurrence_matrices = calculate_co_occurrence(df, vectorized_data, cluster_column)
+    heatmap_data = prepare_heatmap_data(co_occurrence_matrices, vectorized_data, top_enablers, top_entries)
+    return heatmap_data
 
-    def fuzzy_match(needle, haystack):
-        """Checks if needle is present in haystack (case-insensitive, partial match)."""
-        pattern = r".*".join([re.escape(char) for char in needle])
-        return bool(re.search(pattern, haystack, re.IGNORECASE))
-
-    filtered_rows = [r for r in matrix.index if any(fuzzy_match(e, r) for e in top_enablers)]
-    filtered_rows = sorted(filtered_rows, key=lambda x: feature_imp_dict.get(x, float('-inf')), reverse=True)
-
-    filtered_cols_indices = []
-    for entry in top_entries:
-        for i, col in enumerate(matrix.columns):
-            if fuzzy_match(entry, col) and i not in filtered_cols_indices:
-                filtered_cols_indices.append(i)
-                break
-    matrix = matrix.iloc[:, filtered_cols_indices]
-    matrix = matrix.reindex(index=filtered_rows)
-    return matrix
-
-def prepare_heatmap_data(df, top_enablers, top_entries, feature_imp):
-    """Prepares the co-occurrence matrix for heatmap visualization."""
-    enablers = df["Enabler"].explode().unique().tolist()
-    entries = df["Entry (policy intervention)"].explode().unique().tolist()
-    combined_matrix = create_combined_matrix(df, enablers, entries)
-
-    # Cluster rows and columns 
-    avg_matrix = combined_matrix.applymap(lambda x: np.mean(x) if isinstance(x, tuple) else 0)
-    row_linkage = hierarchy.linkage(avg_matrix, method="ward")
-    col_linkage = hierarchy.linkage(avg_matrix.T, method="ward")
-    row_order = hierarchy.dendrogram(row_linkage, no_plot=True)["leaves"]
-    col_order = hierarchy.dendrogram(col_linkage, no_plot=True)["leaves"]
-    combined_matrix = combined_matrix.iloc[row_order, col_order]
-
-    combined_matrix_filtered = apply_fuzzy_matching_and_sorting(combined_matrix, top_enablers, top_entries, feature_imp)
-    return combined_matrix_filtered 
+# If you want to be able to run this script independently for testing:
+if __name__ == "__main__":
+    # Add some test code here
+    pass

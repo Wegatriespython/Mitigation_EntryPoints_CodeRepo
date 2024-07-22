@@ -1,5 +1,9 @@
 import pandas as pd
 import re
+from sklearn.feature_extraction.text import CountVectorizer
+from typing import Tuple, Dict
+import numpy as np
+
 
 def clean_term(text: str) -> str:
     """Clean and standardize a single term from the CSV string."""
@@ -17,6 +21,25 @@ def clean_term(text: str) -> str:
     words = [word for word in text.split() if word not in stop_words]
 
     return ' '.join(words)
+def create_vectorizers() -> Tuple[CountVectorizer, CountVectorizer]:
+    enabler_vectorizer = CountVectorizer(binary=True)
+    entry_vectorizer = CountVectorizer(binary=True)
+    return enabler_vectorizer, entry_vectorizer
+
+def vectorize_data(df: pd.DataFrame, enabler_column: str, entry_column: str) -> Dict[str, np.ndarray]:
+    enabler_vectorizer, entry_vectorizer = create_vectorizers()
+    
+    enabler_matrix = enabler_vectorizer.fit_transform(df[enabler_column].apply(lambda x: ' '.join(x)))
+    entry_matrix = entry_vectorizer.fit_transform(df[entry_column].apply(lambda x: ' '.join(x) if isinstance(x, list) else str(x)))
+    
+    return {
+        'enabler_matrix': enabler_matrix,
+        'entry_matrix': entry_matrix,
+        'enabler_features': enabler_vectorizer.get_feature_names_out(),
+        'entry_features': entry_vectorizer.get_feature_names_out(),
+        'enabler_vectorizer': enabler_vectorizer,
+        'entry_vectorizer': entry_vectorizer
+    }
 
 def load_and_preprocess(file_path: str, enabler_column: str, entry_column: str, cluster_column: str) -> pd.DataFrame:
     """
@@ -39,4 +62,7 @@ def load_and_preprocess(file_path: str, enabler_column: str, entry_column: str, 
 
     # Filter out rows with NaN values in the Cluster column
     df = df.dropna(subset=[cluster_column])
-    return df
+        # Vectorize the data
+    vectorized_data = vectorize_data(df, enabler_column, entry_column)
+
+    return df, vectorized_data
