@@ -13,12 +13,8 @@ def clean_term(text: str) -> str:
     # Remove punctuation and convert to lowercase
     text = re.sub(r'[^\w\s]', '', text.lower())
 
-    # Remove stop words (customize this list as needed)
-    stop_words = set(
-        ['and', 'be', 'in', 'only', 'out', 'rather', 'should', 'so', 'take', 
-         'than', 'the', 'to', 'add', 'consider', 'is', 'whether', 'foreign']
-    )
-    words = [word for word in text.split() if word not in stop_words]
+    
+    words = [word for word in text.split()]
 
     return ' '.join(words)
 def create_vectorizers() -> Tuple[CountVectorizer, CountVectorizer]:
