@@ -6,39 +6,24 @@ from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
 from sklearn.preprocessing import LabelEncoder
 import joblib
 from collections import Counter
+from ..data_processing.general_preprocessing import load_and_preprocess
 
-def clean_term(text):
-    if not isinstance(text, str):
-        return ''
-    
-    # Remove punctuation and convert to lowercase
-    text = re.sub(r'[^\w\s]', '', text.lower())
-    
-    # Remove stop words
-    stop_words = set(['and', 'be', 'in', 'only', 'out', 'rather', 'should', 'so', 'take', 'than', 'the', 'to', 'add', 'consider', 'is', 'whether', 'foreign'])
-    words = [word for word in text.split() if word not in stop_words]
-    
-    return ' '.join(words)
 
-def preprocess_data(df):
-    df_filtered = df.dropna(subset=['Cluster'])
-    df_filtered['Enabler_clean'] = df_filtered['Enabler'].apply(lambda x: [clean_term(term.strip()) for term in x.split(',')])
-    df_filtered['Entry_clean'] = df_filtered['Entry (policy intervention)'].apply(clean_term)
-    return df_filtered
+def create_feature_matrix(df: pd.DataFrame, enabler_column: str, entry_column: str) -> tuple:
+    """Creates a feature matrix from the preprocessed 'Enabler' and 'Entry' columns."""
 
-def create_feature_matrix(df_filtered):
     enabler_vectorizer = CountVectorizer(binary=True)
-    enabler_matrix = enabler_vectorizer.fit_transform(df_filtered['Enabler_clean'].apply(lambda x: ' '.join(x)))
+    enabler_matrix = enabler_vectorizer.fit_transform(df[enabler_column].apply(lambda x: ' '.join(x)))
     enabler_features = enabler_vectorizer.get_feature_names_out()
 
     entry_vectorizer = CountVectorizer(binary=True)
-    entry_matrix = entry_vectorizer.fit_transform(df_filtered['Entry_clean'])
+    entry_matrix = entry_vectorizer.fit_transform(df[entry_column].apply(lambda x: ' '.join(x)))
     entry_features = entry_vectorizer.get_feature_names_out()
 
     feature_matrix = np.hstack((enabler_matrix.toarray(), entry_matrix.toarray()))
     feature_names = np.concatenate((enabler_features, entry_features))
 
-    return feature_matrix, feature_names
+    return feature_matrix, feature_names, enabler_features
 
 def train_random_forest(feature_matrix, y):
     rf_params = {
@@ -65,9 +50,9 @@ def get_top_features(feature_imp, feature_type, N, df_filtered):
     
     if len(top_features) < N:
         if feature_type == 'Enabler':
-            all_features = [item for sublist in df_filtered['Enabler'].str.split(',') for item in sublist]
+            all_features = [item for sublist in df_filtered['Enabler'] for item in sublist]
         else:
-            all_features = df_filtered['Entry (policy intervention)'].tolist()
+            all_features = [item for sublist in df_filtered['Entry (policy intervention)'] for item in sublist]
         
         feature_counts = Counter(all_features)
         additional_features = [f for f, _ in feature_counts.most_common() if f not in top_features]
@@ -75,14 +60,34 @@ def get_top_features(feature_imp, feature_type, N, df_filtered):
     
     return top_features[:N]
 
-def run_random_forest_analysis(df, output_file):
-    df_filtered = preprocess_data(df)
-    feature_matrix, feature_names = create_feature_matrix(df_filtered)
+def run_random_forest_analysis(df: pd.DataFrame, enabler_column: str, entry_column: str, 
+                              cluster_column: str, output_file: str):
+    """Runs the complete Random Forest analysis pipeline."""
+
+    feature_matrix, feature_names, enabler_features = create_feature_matrix(
+        df, enabler_column, entry_column
+    )
 
     le = LabelEncoder()
-    y = le.fit_transform(df_filtered['Cluster'])
+    y = le.fit_transform(df[cluster_column])
+
+    # Check class distribution and remove classes with only one member
+    class_counts = np.bincount(y)
+    if np.min(class_counts) == 1:
+        print("Removing classes with only one member...")
+        valid_classes = np.where(class_counts > 1)[0]
+        mask = np.isin(y, valid_classes)
+        feature_matrix = feature_matrix[mask]
+        y = y[mask]
+        y = le.fit_transform(y)
+        print("New class distribution:", np.bincount(y))
+        print("New minimum class size:", np.min(np.bincount(y)))
 
     random_search = train_random_forest(feature_matrix, y)
+
+    print("\nRandom Forest optimization complete.")
+    print("Best parameters:", random_search.best_params_)
+    print("Best cross-validation score:", random_search.best_score_)
 
     importances = random_search.best_estimator_.feature_importances_
     feature_imp = pd.DataFrame({
@@ -93,8 +98,26 @@ def run_random_forest_analysis(df, output_file):
     feature_imp = feature_imp.sort_values(by='importance', ascending=False)
 
     N = 10
-    top_enablers = get_top_features(feature_imp, 'Enabler', N, df_filtered)
-    top_entries = get_top_features(feature_imp, 'Entry', N, df_filtered)
+    top_enablers = get_top_features(feature_imp, 'Enabler', N, df)
+    top_entries = get_top_features(feature_imp, 'Entry', N, df)
+
+    print(f"\nTop {N} Enablers:")
+    for enabler in top_enablers:
+        importance = feature_imp[feature_imp['feature'] == enabler]['importance'].values
+        if len(importance) > 0 and importance[0] > 0:
+            print(f"{enabler}: {importance[0]}")
+        else:
+            count = sum(enabler in enablers for enablers in df['Enabler'])
+            print(f"{enabler}: Added based on frequency (count: {count})")
+
+    print(f"\nTop {N} Entries:")
+    for entry in top_entries:
+        importance = feature_imp[feature_imp['feature'] == entry]['importance'].values
+        if len(importance) > 0 and importance[0] > 0:
+            print(f"{entry}: {importance[0]}")
+        else:
+            count = df['Entry (policy intervention)'].value_counts().get(entry, 0)
+            print(f"{entry}: Added based on frequency (count: {count})")
 
     results = {
         'df': df,
@@ -106,9 +129,22 @@ def run_random_forest_analysis(df, output_file):
 
     return results
 
+def load_or_run_random_forest_analysis(df, output_file):
+    if os.path.exists(output_file):
+        print(f"Loading existing results from {output_file}")
+        return joblib.load(output_file)
+    else:
+        print(f"Running Random Forest analysis and saving results to {output_file}")
+        return run_random_forest_analysis(df, output_file)
+
 if __name__ == "__main__":
     # Example usage
-    file_path = "path/to/your/codebook.xlsx"
-    df = pd.read_excel(file_path)
-    results = run_random_forest_analysis(df, 'rf_analysis_results.joblib')
-    print("Analysis complete. Results saved to 'rf_analysis_results.joblib'")
+    # Load the data
+    file_path = "C:/Users/vigneshr/OneDrive - Wageningen University & Research/Internship/Literature Review/Final Data Processing/Omnibus Generator/Codebook_Transport.xlsm".replace("\\", "/")
+    enabler_column = "Enabler" 
+    entry_column = "Entry (policy intervention)"
+    cluster_column = "Cluster"
+    output_file = "rf_analysis_results.joblib"
+
+    df = load_and_preprocess(file_path, enabler_column, entry_column, cluster_column)
+    results = run_random_forest_analysis(df, enabler_column, entry_column, cluster_column, output_file)
