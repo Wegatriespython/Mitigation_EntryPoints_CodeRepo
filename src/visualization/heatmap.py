@@ -98,6 +98,4 @@ def create_and_save_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str
     """
     fig, heatmap_ax, legend_ax = create_heatmap(co_occurrence_data, clusters, color_palette) # Pass color_palette
        
-    plt.tight_layout()
-    plt.savefig(output_file, dpi=300, bbox_inches="tight")
-    plt.close(fig)
+    plt.show()
