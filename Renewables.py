@@ -8,7 +8,7 @@ from src.analysis.Co_occurrence import run_co_occurrence_analysis
 from src.analysis.Co_occurrence import calculate_co_occurrence
 from src.data_processing.general_preprocessing import load_and_preprocess
 from src.visualization.heatmap import create_and_save_heatmap 
-from src.analysis.random_forest import load_or_run_random_forest_analysis
+from src.analysis.random_forest import run_random_forest_analysis
 import matplotlib.pyplot as plt
 
 
@@ -81,19 +81,18 @@ def main():
 
     # Batch Analysis
     for batch_idx, batch_clusters in enumerate(cluster_batches):
-        df_batch = df[df[CLUSTER_COLUMN].isin(batch_clusters)]
-
+        df_batch = df[df[CLUSTER_COLUMN].isin(batch_clusters)].copy()
            # Run Random Forest for the batch
-        results, rf_results_file = load_or_run_random_forest_analysis(
+        results= run_random_forest_analysis(
             INPUT_FILE,
             ENABLER_COLUMN,
             ENTRY_COLUMN,
             CLUSTER_COLUMN,
             10,  # n_enablers
             10,  # n_entries
-            None,  # output_file is not needed anymore
+            RF_RESULTS_FILE_PREFIX,
             detailed=True,
-            batch=str(batch_idx + 1)
+            df=df_batch  # Pass the subset dataframe to the function
         )
         top_enablers = results['top_enablers']
         top_entries = results['top_entries']
@@ -106,6 +105,7 @@ def main():
             CLUSTER_COLUMN,
             top_enablers,
             top_entries
+           # Pass the subset dataframe to the function
         )
 
         # Create and Save Heatmap for the batch

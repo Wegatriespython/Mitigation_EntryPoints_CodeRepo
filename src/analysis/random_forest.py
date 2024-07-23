@@ -112,8 +112,10 @@ def get_top_features_proportional(feature_imp: pd.DataFrame, feature_type: str, 
 
 def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column: str, 
                                cluster_column: str, n_enablers: int, n_entries: int, 
-                               output_file: str, detailed: bool = False) -> Dict:
-    df, _ = load_and_preprocess(file_path, enabler_column, entry_column, cluster_column)
+                               output_file: str, detailed: bool = False, df: pd.DataFrame = None) -> Dict:
+    if df is None:
+        df, _ = load_and_preprocess(file_path, enabler_column, entry_column, cluster_column)
+    
     feature_matrix, feature_names, enabler_features = create_feature_matrix(df, enabler_column, entry_column)
 
     le = LabelEncoder()
@@ -181,9 +183,10 @@ def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column
     joblib.dump(results, output_file)
     return results
 
+
 def load_or_run_random_forest_analysis(file_path: str, enabler_column: str, entry_column: str, 
                                        cluster_column: str, n_enablers: int, n_entries: int, 
-                                       output_file: str, detailed: bool = False, batch: str = None):
+                                       output_file: str, detailed: bool = False, df: pd.DataFrame = None):
     # Extract the codebook name from the file path
     codebook_name = os.path.splitext(os.path.basename(file_path))[0].split('_')[-1]
     
@@ -191,29 +194,25 @@ def load_or_run_random_forest_analysis(file_path: str, enabler_column: str, entr
     method = "detailed" if detailed else "vanilla"
     
     # Create the new output filename
-    if batch:
-        new_output_file = f"RF_{codebook_name}_{method}_batch_{batch}.joblib"
-    else:
-        new_output_file = f"RF_{codebook_name}_{method}.joblib"
+    new_output_file = f"RF_{codebook_name}_{method}.joblib"
     
     # Ensure the output is saved in the data/processed directory
     output_dir = os.path.join(os.path.dirname(os.path.dirname(file_path)), "processed")
     os.makedirs(output_dir, exist_ok=True)
     new_output_file = os.path.join(output_dir, new_output_file)
     
-    if os.path.exists(new_output_file):
+    if os.path.exists(new_output_file) and df is None:
         print(f"Loading existing results from {new_output_file}")
         results = joblib.load(new_output_file)
     else:
         print(f"Running Random Forest analysis and saving results to {new_output_file}")
         results = run_random_forest_analysis(file_path, enabler_column, entry_column, cluster_column, 
-                                             n_enablers, n_entries, new_output_file, detailed)
+                                             n_enablers, n_entries, new_output_file, detailed, df)
         
         # Add metadata to the results
         results['metadata'] = {
             'codebook': codebook_name,
-            'method': method,
-            'batch': batch
+            'method': method
         }
         
         joblib.dump(results, new_output_file)
