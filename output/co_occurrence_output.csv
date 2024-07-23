@@ -1,0 +1,12 @@
+,e_infrastructure_investments,r_procurement_rules_govt_consumption,t_formal_target,v_negotiated_agreements_publicprivate_sector,p_institutional_creation,e_tax_relief_demand_side,e_consumption_subsidy,t_formal_transport_target,e_public_privat_partnership,e_rdd_funding
+e_electricity_mix,4,2,0,0,2,4,0,0,0,3
+s_public_acceptance,3,1,0,1,0,2,0,1,1,1
+s_history_of_sustained_support,3,1,0,1,0,2,0,1,0,1
+s_energy_security,1,1,0,0,0,1,0,0,0,1
+i_political_system,1,1,0,0,0,1,0,0,0,1
+e_economic_growth_objective,1,2,1,0,0,2,0,0,0,2
+e_interest_group_support,2,0,0,0,0,2,0,0,1,2
+i_political_acceptance,1,1,0,0,1,1,0,0,0,1
+e_market_structure,3,1,0,0,1,3,1,0,1,3
+env_impact,3,2,0,0,0,3,0,0,1,3
+s_interest_group_support,1,1,0,0,1,1,0,0,0,1
