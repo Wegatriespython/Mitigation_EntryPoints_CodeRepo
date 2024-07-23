@@ -10,8 +10,8 @@ from src.analysis.Co_occurrence import run_co_occurrence_analysis
 from src.visualization.heatmap import create_and_save_heatmap
 
 # File paths and settings
-INPUT_FILE = "C:/Users/vigne/OneDrive - Wageningen University & Research/Internship/Literature Review/Final Data Processing/Mitigation_EntryPoints_CodeRepo/data/raw/Codebook_Transport.xlsm"
-RF_RESULTS_FILE = "rf_analysis_results.joblib"
+INPUT_FILE = "C:/Users/vigneshr/OneDrive - Wageningen University & Research/Internship/Literature Review/Final Data Processing/Mitigation_EntryPoints_CodeRepo/data/raw/Codebook_Transport.xlsm"
+RF_RESULTS_FILE = "data/processed/rf_analysis_results.joblib"
 HEATMAP_OUTPUT = "transport_co_occurrence_heatmap.png"
 
 # Column names
@@ -20,16 +20,16 @@ ENTRY_COLUMN = "Entry (policy intervention)"
 CLUSTER_COLUMN = "Cluster"
 
 # Analysis parameters
-N_ENABLERS = 15
+N_ENABLERS = 10
 N_ENTRIES = 10
-DETAILED_RF = False  # Set to True for detailed analysis, False for vanilla
+DETAILED_RF = True  # Set to True for detailed analysis, False for vanilla
 
 def main():
     print("Starting analysis pipeline...")
 
     # Run Random Forest Analysis
     print("Running Random Forest analysis...")
-    rf_results = load_or_run_random_forest_analysis(
+    rf_results, rf_results_file  = load_or_run_random_forest_analysis(
         INPUT_FILE, ENABLER_COLUMN, ENTRY_COLUMN, CLUSTER_COLUMN, 
         N_ENABLERS, N_ENTRIES, RF_RESULTS_FILE, DETAILED_RF
     )

@@ -1,24 +1,26 @@
 import pandas as pd
 import numpy as np
 import joblib
+import os
 from scipy.spatial.distance import pdist, squareform
 from itertools import combinations
-from src.analysis.Co_occurrence import prepare_heatmap_data, calculate_co_occurrence  
-from src.visualization.heatmap import create_and_save_heatmap 
-from src.analysis.random_forest import run_random_forest_analysis
+from src.analysis.Co_occurrence import run_co_occurrence_analysis
+from src.analysis.Co_occurrence import calculate_co_occurrence
 from src.data_processing.general_preprocessing import load_and_preprocess
+from src.visualization.heatmap import create_and_save_heatmap 
+from src.analysis.random_forest import load_or_run_random_forest_analysis
 import matplotlib.pyplot as plt
 
+
 # File paths and settings
-INPUT_FILE = "C:/Users/vigne/OneDrive - Wageningen University & Research/Internship/Literature Review/Final Data Processing/Mitigation_EntryPoints_CodeRepo/data/raw/REWindSolar.xlsx"
+INPUT_FILE = "C:\\Users\\vigneshr\\OneDrive - Wageningen University & Research\\Internship\\Literature Review\\Final Data Processing\\Mitigation_EntryPoints_CodeRepo\\data\\raw\\REWindSolar.xlsx"
 RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_"
-HEATMAP_OUTPUT_PREFIX = "Renewables:Wind&Solar_Co_occurrence_heatmap_"
+HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
 
 def calculate_cluster_centers(co_occurrence_matrices):
-    # Convert CSR matrix to dense array, then flatten
     centers = np.array([matrix.toarray().flatten() for matrix in co_occurrence_matrices.values()])
     return centers
 
@@ -68,38 +70,48 @@ def main():
             [clusters[i] for i in group1],
             [clusters[i] for i in group2]
         ]
+        # Print cluster batches
+        print("Cluster Batches:")
+        for i, batch in enumerate(cluster_batches):
+            print(f"Batch {i+1}: {', '.join(batch)}")
     else:
         cluster_batches = [clusters]
-    # Color palettes
-    color_palettes = [plt.cm.viridis, plt.cm.plasma]
+        print("Cluster Batch:")
+        print(f"Single Batch: {', '.join(clusters)}")
 
     # Batch Analysis
     for batch_idx, batch_clusters in enumerate(cluster_batches):
         df_batch = df[df[CLUSTER_COLUMN].isin(batch_clusters)]
 
-        # Run Random Forest for the batch
-        rf_results_file = f"{RF_RESULTS_FILE_PREFIX}batch_{batch_idx + 1}.joblib"
-        results = run_random_forest_analysis(
-            INPUT_FILE,  # file_path
+           # Run Random Forest for the batch
+        results, rf_results_file = load_or_run_random_forest_analysis(
+            INPUT_FILE,
             ENABLER_COLUMN,
             ENTRY_COLUMN,
             CLUSTER_COLUMN,
-            15,  # n_enablers (you may want to define this as a constant)
-            10,  # n_entries (you may want to define this as a constant)
-            rf_results_file,
-            detailed=False  # or True, depending on your preference
+            10,  # n_enablers
+            10,  # n_entries
+            None,  # output_file is not needed anymore
+            detailed=True,
+            batch=str(batch_idx + 1)
         )
-        df_batch = results['df']
         top_enablers = results['top_enablers']
         top_entries = results['top_entries']
-        feature_imp = results['feature_imp']
 
-        # Prepare Heatmap Data for the batch
-        co_occurrence_matrix = prepare_heatmap_data(df_batch, top_enablers, top_entries, feature_imp)
+        # Run Co-occurrence Analysis for the batch
+        co_occurrence_data = run_co_occurrence_analysis(
+            INPUT_FILE,
+            ENABLER_COLUMN,
+            ENTRY_COLUMN,
+            CLUSTER_COLUMN,
+            top_enablers,
+            top_entries
+        )
 
         # Create and Save Heatmap for the batch
-        heatmap_output = f"{HEATMAP_OUTPUT_PREFIX}batch_{batch_idx + 1}.png"
-        create_and_save_heatmap(co_occurrence_matrix, batch_clusters, heatmap_output, color_palette=color_palettes[batch_idx % len(color_palettes)])
-
+        output_dir = os.path.join(os.path.dirname(os.path.dirname(INPUT_FILE)), "output")
+        os.makedirs(output_dir, exist_ok=True)
+        heatmap_output = os.path.join(output_dir, f"{HEATMAP_OUTPUT_PREFIX}batch_{batch_idx + 1}.png")
+        create_and_save_heatmap(co_occurrence_data, batch_clusters, heatmap_output)
 if __name__ == "__main__":
     main()

@@ -73,20 +73,42 @@ def get_top_features_vanilla(feature_imp: pd.DataFrame, feature_type: str, N: in
     return top_features[:N]
 
 def get_top_features_proportional(feature_imp: pd.DataFrame, feature_type: str, N: int, y: np.ndarray) -> List[str]:
+    print(f"\nDebugging get_top_features_proportional for {feature_type}")
     class_sizes = np.bincount(y)
     class_proportions = class_sizes / np.sum(class_sizes)
+    
+    print(f"Class sizes: {class_sizes}")
+    print(f"Class proportions: {class_proportions}")
     
     type_feature_imp = feature_imp[feature_imp['type'] == feature_type].copy()
     
     top_features = []
     for class_label, proportion in enumerate(class_proportions):
         n_features = max(1, int(np.ceil(N * proportion)))
+        print(f"\nClass {class_label}: Selecting {n_features} features")
+        
         class_importance = type_feature_imp['importance'] * (y == class_label).mean()
         type_feature_imp['class_importance'] = class_importance
         class_top_features = type_feature_imp.nlargest(n_features, 'class_importance')['feature'].tolist()
+        
+        print(f"Top features for class {class_label}: {class_top_features}")
         top_features.extend(class_top_features)
     
-    return list(dict.fromkeys(top_features))[:N]
+    # Simple fix for duplicates: use a set to remove duplicates, then convert back to list
+    top_features = list(dict.fromkeys(top_features))
+    
+    print(f"\nTotal features selected before truncation: {len(top_features)}")
+    print(f"Features: {top_features}")
+    
+    # If we don't have enough features, add the most important remaining ones
+    if len(top_features) < N:
+        print(f"Not enough features selected. Adding {N - len(top_features)} more.")
+        remaining_features = type_feature_imp[~type_feature_imp['feature'].isin(top_features)].nlargest(N - len(top_features), 'importance')['feature'].tolist()
+        top_features.extend(remaining_features)
+    
+    result = top_features[:N]
+    print(f"\nFinal {N} features selected: {result}")
+    return result
 
 def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column: str, 
                                cluster_column: str, n_enablers: int, n_entries: int, 
@@ -161,7 +183,7 @@ def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column
 
 def load_or_run_random_forest_analysis(file_path: str, enabler_column: str, entry_column: str, 
                                        cluster_column: str, n_enablers: int, n_entries: int, 
-                                       output_file: str, detailed: bool = False):
+                                       output_file: str, detailed: bool = False, batch: str = None):
     # Extract the codebook name from the file path
     codebook_name = os.path.splitext(os.path.basename(file_path))[0].split('_')[-1]
     
@@ -169,11 +191,19 @@ def load_or_run_random_forest_analysis(file_path: str, enabler_column: str, entr
     method = "detailed" if detailed else "vanilla"
     
     # Create the new output filename
-    new_output_file = f"RF_{codebook_name}_{method}.joblib"
+    if batch:
+        new_output_file = f"RF_{codebook_name}_{method}_batch_{batch}.joblib"
+    else:
+        new_output_file = f"RF_{codebook_name}_{method}.joblib"
+    
+    # Ensure the output is saved in the data/processed directory
+    output_dir = os.path.join(os.path.dirname(os.path.dirname(file_path)), "processed")
+    os.makedirs(output_dir, exist_ok=True)
+    new_output_file = os.path.join(output_dir, new_output_file)
     
     if os.path.exists(new_output_file):
         print(f"Loading existing results from {new_output_file}")
-        return joblib.load(new_output_file)
+        results = joblib.load(new_output_file)
     else:
         print(f"Running Random Forest analysis and saving results to {new_output_file}")
         results = run_random_forest_analysis(file_path, enabler_column, entry_column, cluster_column, 
@@ -183,10 +213,12 @@ def load_or_run_random_forest_analysis(file_path: str, enabler_column: str, entr
         results['metadata'] = {
             'codebook': codebook_name,
             'method': method,
+            'batch': batch
         }
         
         joblib.dump(results, new_output_file)
-        return results
+    
+    return results, new_output_file
 
 if __name__ == "__main__":
     # Example usage

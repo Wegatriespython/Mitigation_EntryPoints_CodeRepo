@@ -9,6 +9,8 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
     """
     Create a custom heatmap from co-occurrence data.
     """
+        # Filter co_occurrence_data to include only the specified clusters
+    co_occurrence_data = co_occurrence_data[clusters]
     fig = plt.figure(figsize=(24, 12))
     gs = fig.add_gridspec(1, 2, width_ratios=[1, 3])
 
@@ -18,37 +20,56 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
     n_clusters = len(clusters)
 
     # Use specified color palette or default
-    if color_palette is not None:
-        base_colors = color_palette(np.linspace(0, 1, n_clusters))
-    else: 
-        base_colors = plt.cm.Set1(np.linspace(0, 1, 9))[:n_clusters]  # Default colormap
+    try:
+        if color_palette is not None:
 
-    cluster_cmaps = [LinearSegmentedColormap.from_list("", ["white", color]) for color in base_colors]
-   
+            base_colors = color_palette(np.linspace(0, 1, max(n_clusters, 2)))[:n_clusters]
+        else: 
+
+            base_colors = plt.cm.Set1(np.linspace(0, 1, max(9, n_clusters)))[:n_clusters]  # Ensure at least 9 colors
+        
+
+        
+        cluster_cmaps = [LinearSegmentedColormap.from_list("", ["white", color]) for color in base_colors]
+
+    except Exception as e:
+
+        raise
+
     max_co_occurrence = co_occurrence_data.max().max()
+
+
 
     enablers = co_occurrence_data.index.get_level_values(0).unique()
     entries = co_occurrence_data.index.get_level_values(1).unique()
 
+
+
     for i, enabler in enumerate(enablers):
         for j, entry in enumerate(entries):
-            values = co_occurrence_data.loc[(enabler, entry)].values
-            if sum(v > 0 for v in values) >= 2:
-                heatmap_ax.add_patch(plt.Rectangle((j, i), 1, 1, fill=True, facecolor="lightgray", edgecolor="none"))
+            try:
+                values = co_occurrence_data.loc[(enabler, entry)].values
 
-            for k, value in enumerate(values):
-                if value > 0:
-                    normalized_value = value / max_co_occurrence
-                    color = cluster_cmaps[k](normalized_value)
-                    size = max(100, min(1000, 1000 * normalized_value))
-                    heatmap_ax.scatter(
-                        j + (k + 1) / (n_clusters + 1),
-                        i + 0.5,
-                        s=size,
-                        color=color,
-                        edgecolor="black",
-                        linewidth=0.5,
-                    )
+                if sum(v > 0 for v in values) >= 2:
+                    heatmap_ax.add_patch(plt.Rectangle((j, i), 1, 1, fill=True, facecolor="lightgray", edgecolor="none"))
+
+                for k, value in enumerate(values):
+                    if value > 0:
+                        normalized_value = value / max_co_occurrence
+
+                        color = cluster_cmaps[k](normalized_value)
+                        size = max(100, min(1000, 1000 * normalized_value))
+                        heatmap_ax.scatter(
+                            j + (k + 1) / (n_clusters + 1),
+                            i + 0.5,
+                            s=size,
+                            color=color,
+                            edgecolor="black",
+                            linewidth=0.5,
+                        )
+            except Exception as e:
+
+                raise
 
     heatmap_ax.set_xticks(np.arange(len(entries)) + 0.5)
     heatmap_ax.set_yticks(np.arange(len(enablers)) + 0.5)
