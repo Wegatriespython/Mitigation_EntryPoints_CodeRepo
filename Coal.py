@@ -67,7 +67,7 @@ def main():
     output_dir = os.path.join(os.path.dirname(os.path.dirname(INPUT_FILE)), "output")
     os.makedirs(output_dir, exist_ok=True)
     heatmap_output = os.path.join(output_dir, f"{HEATMAP_OUTPUT_PREFIX}.png")
-    create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output, color_palette=color_palette, title="Coal Co-occurrence Heatmap")
+    create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output, color_palette=color_palette, title="Coal Entry Points for Unlocks")
 
 if __name__ == "__main__":
     main()
