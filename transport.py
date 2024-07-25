@@ -71,7 +71,7 @@ def main():
     heatmap_output = os.path.join(output_dir, f"{HEATMAP_OUTPUT_PREFIX}.png")
 
     # Define the title for the heatmap
-    title = "Transport Entrypoints for Unlocks"    
+    title = "Transport Entry Points for Unlocks"    
     create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output, 
                             color_palette=color_palette, title=title)
 
