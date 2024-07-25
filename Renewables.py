@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 # File paths and settings
 INPUT_FILE = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\REWindSolar.xlsx"
 RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_"
-HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_final4"
+HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_final15"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -107,15 +107,22 @@ def main():
         print(f"\nProcessing Batch {batch_idx + 1}")
         df_batch = df[df[CLUSTER_COLUMN].isin(batch_clusters)].copy()
         
+        if batch_idx == 0:
+            n_enablers = 9
+            n_entries = 12
+        else : 
+            n_enablers = 12
+            n_entries = 9   
         # Run Random Forest for the batch
         results = run_random_forest_analysis(
             INPUT_FILE,
             ENABLER_COLUMN,
             ENTRY_COLUMN,
             CLUSTER_COLUMN,
-            10,  # n_enablers
-            10,  # n_entries
+            n_enablers,  # n_enablers
+            n_entries,  # n_entries
             RF_RESULTS_FILE_PREFIX,
+            detailed= False,
             cluster_specific= True,
             df=df_batch
         )
@@ -139,7 +146,7 @@ def main():
         heatmap_output = os.path.join(output_dir, f"{HEATMAP_OUTPUT_PREFIX}batch_{batch_idx + 1}.png")
         
         # Use different color palette for each batch
-        title = f"WindSolar Co-occurrence Heatmap Batch {batch_idx + 1}"
+        title = f"Wind & Solar Entry Points for Unlocks Part {batch_idx + 1}"
         color_palette = color_palette1 if batch_idx == 0 else color_palette2
         
         print(f"Creating heatmap for Batch {batch_idx + 1}")

@@ -41,6 +41,7 @@ def main():
         10,  # n_enablers
         10,  # n_entries
         RF_RESULTS_FILE_PREFIX,
+        detailed= False,
         cluster_specific= False,
         df=df
     )

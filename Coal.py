@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from src.analysis.Co_occurrence import run_co_occurrence_analysis, calculate_co_occurrence, get_bisection_data
+from src.analysis.Co_occurrence import run_co_occurrence_analysis, calculate_co_occurrence, get_bisection_data, count_features
 from src.data_processing.general_preprocessing import load_and_preprocess
 from src.visualization.heatmap import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
@@ -21,6 +21,7 @@ def main():
     # Calculate full co-occurrences
     co_occurrence_matrices = calculate_co_occurrence(df, vectorized_data, CLUSTER_COLUMN)
     
+
     # Determine clusters
     clusters = df[CLUSTER_COLUMN].unique()
     print(f"Clusters: {clusters}")
@@ -41,8 +42,10 @@ def main():
         15,  # n_enablers
         5,  # n_entries
         RF_RESULTS_FILE_PREFIX,
+        detailed= False,
         cluster_specific= False,
-        df=df
+        df=df       
+     
     )
     top_enablers = results['top_enablers']
     top_entries = results['top_entries']

@@ -2,6 +2,28 @@ import pandas as pd
 import numpy as np
 from src.data_processing.general_preprocessing import load_and_preprocess
 from src.data_processing.general_preprocessing import vectorize_data
+from scipy.sparse import csr_matrix
+from typing import Dict, List
+
+def count_features( vectorized_data: Dict[str, csr_matrix]) -> pd.DataFrame:
+
+    enabler_features = vectorized_data['enabler_features']
+    entry_features = vectorized_data['entry_features']
+    
+    enabler_matrix = vectorized_data['enabler_matrix']
+    entry_matrix = vectorized_data['entry_matrix']
+
+    enabler_counts = enabler_matrix.sum(axis=0).A1  # Sum over columns to get feature counts
+    entry_counts = entry_matrix.sum(axis=0).A1
+    
+    enabler_features_list = [{'feature': name, 'type': 'Enabler', 'count': count} for name, count in zip(enabler_features, enabler_counts)]
+    entry_features_list = [{'feature': name, 'type': 'Entry', 'count': count} for name, count in zip(entry_features, entry_counts)]
+    
+    feature_counts = enabler_features_list + entry_features_list
+    feature_counts_df = pd.DataFrame(feature_counts)
+    
+    return feature_counts_df
+
 
 def calculate_co_occurrence(df, vectorized_data, cluster_column):
     enabler_matrix = vectorized_data['enabler_matrix']

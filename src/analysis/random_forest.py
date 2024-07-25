@@ -6,11 +6,14 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold, LeaveOneOut
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import LabelBinarizer
+from imblearn.over_sampling import RandomOverSampler
+from imblearn.over_sampling import SMOTE
 from sklearn.utils.class_weight import compute_class_weight
 import joblib
 from collections import Counter
 from typing import Dict, List, Tuple, Union
 from src.data_processing.general_preprocessing import load_and_preprocess
+from scipy.sparse import csr_matrix
 
 def create_feature_matrix(df: pd.DataFrame, enabler_column: str, entry_column: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     enabler_vectorizer = CountVectorizer(binary=True)
@@ -34,11 +37,18 @@ def train_random_forest(feature_matrix: np.ndarray, y: np.ndarray, detailed: boo
         'min_samples_leaf': [1, 2, 4],
         'max_features': ['sqrt', 'log2', None],
     }
-    
+
     if detailed:
-        class_weights = compute_class_weight('balanced', classes=np.unique(y), y=y)
-        class_weight_dict = dict(zip(np.unique(y), class_weights))
-        rf_params['class_weight'] = [class_weight_dict, 'balanced', 'balanced_subsample']
+        # Apply RandomOverSampler if min class size is 1, else apply SMOTE
+        if np.min(np.bincount(y)) == 1:
+            Sampler = RandomOverSampler(random_state=42)
+        else :
+            min_samples_per_class = np.min(np.bincount(y))
+            k_neighbors = min(5, min_samples_per_class - 1)  # Ensure k_neighbors < min_samples_per_class
+            Sampler = SMOTE(random_state=42, k_neighbors=k_neighbors)
+
+        feature_matrix, y = Sampler.fit_resample(feature_matrix, y)
+        rf_params['class_weight'] = ['balanced', 'balanced_subsample', None]
     else:
         rf_params['class_weight'] = ['balanced', 'balanced_subsample', None]
 
@@ -51,6 +61,8 @@ def train_random_forest(feature_matrix: np.ndarray, y: np.ndarray, detailed: boo
                                        n_iter=100, cv=cv, verbose=1, random_state=42, n_jobs=-1)
     random_search.fit(feature_matrix, y)
     return random_search
+
+
 
 def get_top_features(feature_imp: pd.DataFrame, feature_type: str, N: int) -> List[str]:
     """
@@ -272,7 +284,8 @@ def aggregate_cluster_results(cluster_importances: Dict[str, pd.DataFrame],
 def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column: str, 
                                cluster_column: str, n_enablers: int, n_entries: int, 
                                output_file: str, detailed: bool = False, df: pd.DataFrame = None,
-                               cluster_specific: bool = False) -> Dict:
+                               cluster_specific: bool = False
+                               ) -> Dict:
     print("Starting run_random_forest_analysis")
     if df is None:
         print("Loading and preprocessing data")
@@ -293,7 +306,7 @@ def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column
         cluster_importances = run_cluster_specific_random_forest(df, feature_matrix, y, feature_names, enabler_features, cluster_names)
         print("Aggregating cluster results")
         cluster_sizes = {cluster: np.sum(y == i) for i, cluster in enumerate(cluster_names)}
-        results = aggregate_cluster_results(cluster_importances,n_enablers, n_entries, cluster_sizes)
+        results = aggregate_cluster_results(cluster_importances, n_enablers, n_entries, cluster_sizes)
     else:
         print("Running regular random forest")
         random_search = train_random_forest(feature_matrix, y, detailed)
@@ -306,6 +319,8 @@ def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column
         feature_imp = feature_imp.sort_values(by='importance', ascending=False)
 
         print("Selecting top features")
+        
+       
         top_enablers = get_top_features(feature_imp, 'Enabler', n_enablers)
         top_entries = get_top_features(feature_imp, 'Entry', n_entries)
 
