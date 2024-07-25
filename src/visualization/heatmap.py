@@ -20,16 +20,32 @@ def clean_labels(labels):
         'e_economic_growth_objective': 'Economic Growth Objective',
         'e_market_structure': 'Market Structure',
         's_path_dependency': 'Path Dependency',
+        's_distributional_effects': 'Distributional Effects',
+        's_energy_security': 'Energy Security',
+        'e_gdp_per_capita': 'GDP per Capita',
         'e_cost_of_capital': 'Capital Costs',
         'i_policy_environment': 'Policy Environment',
         't_risk': 'Risk',
+        'e_feedin_premiums': 'Feed-in Premiums',
+        'e_tax_relief_supply_side': 'Supply-side Tax Relief',
+        'e_market_financial': 'Financial Markets',
+        'e_interest_rates': 'Interest Rates',
+        'i_learning': 'Learning',
+        'e_share_oil_gas_gdp': 'Oil and Gas Share of GDP',
+        'e_market_creation': 'Market Formation',
+        'e_rdd_funding': 'R&D Funding',
+        'cl_coordinating_body_for_climate_strategy': 'Climate Strategy Coordination',
+        't_political_renewable_energy_target': 'RE Targets',	
         'i_political_system': 'Political System',
         's_interest_group_support': 'Interest Group Support',
         'i_institutional_capacity': 'Institutional Capacity',
         's_public_acceptance': 'Public Acceptance',
         't_transfer': 'Transfer',
+        'i_policy': 'Policy Environment',
         'e_fiscal_latitude': 'Fiscal Latitude',
         'e_feedin_tariffs': 'Feed-in Tariffs',
+        'e_costs' : 'Costs',
+        't_substitutability': 'Substitutability',
         'i_professional_training_and_qualification': 'Professional Training',
         's_land_use_consenting': 'Land Use Consenting',
         'e_investor_risk': 'Investment Risk',
@@ -41,9 +57,43 @@ def clean_labels(labels):
         't_formal_re_target': 'Formal RE Targets',
         'e_production_subsidy': 'Production Subsidies',
         'v_negotiated_agreements_publicprivate_sector': 'Public-Private Agreements',
+        's_domestic_industry': 'Domestic Industry',
+        'i_international_agreement': 'International Agreements',
+        's_climate_targets': 'Climate Targets',
+        's_history_of_sustained_support': 'Sustained Support',
+        's_rural_development': 'Rural Development Objectieve',
+        'r_other_mandatory_requirements': 'Other Mandatory Requirements',
+        'e_market_incentives': 'Market Incentives',
+        'env_climate_conditions': 'Climate Conditions',
+        'r_mandatory_biofuel_share': 'Mandatory Biofuel Share',
+        'r_biofuel_blending_mandate': 'Biofuel Blend Mandate',
+        'e_co2_taxes': 'CO2 Taxes',
+        'e_grants_and_subsidies': 'Grants and Subsidies',
+        'r_obligation_schemes': 'Obligation Schemes',
+        'e_carbon_price': 'Carbon Price',
         'p_strategic_planning': 'Strategic Planning',
         'e_state_loans': 'State Loans',
         'r_auditing': 'Auditing',
+        'e_employment_effects': 'Employment Effect',
+        'i_political_support_international_competition': 'International Competition',
+        'e_energy_mix': 'Energy Mix',
+        't_substituability': 'Substitutability',
+        'i_envi_party': 'Environmental Party',
+        'env_impact': 'Environmental Impact',
+        'e_interest_group_support': 'Economic Interest Backing',
+        's_education': 'Education',
+        'e_costs_state':'Cost to State',
+        's_structural_reform': 'Structural Reform',
+        'e_cost': 'Cost',
+        't_substitutability': 'Technological Substitutability',
+        'e_employment_effect': 'Employment Effect',
+        't_maturity': 'Technological Maturity',
+        'e_share_electricity_coal': 'Coal Share of Electricity',
+        'e_share_energy_coal': 'Coal Share of Energy',
+        'i_policy_design': 'Policy Design',
+        't_political_target': 'Coal Phase Out Target',
+        'e_retirement_premium': 'Retirement Premiums',
+        'b_removal_of_fossilfuel_subsidies': 'Fossil Fuel Subsidy Removal',
         'r_procurement_rules_general': 'Renewable Portfolio Standards',  
         'e_green_certificates': 'Green Certificates',
         'e_infrastructure_investments': 'Infrastructure Investments',
@@ -52,7 +102,7 @@ def clean_labels(labels):
     }
     return [cleanup_dict.get(label, label) for label in labels]
 
-def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_palette=None) -> Tuple[plt.Figure, plt.Axes]:
+def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_palette=None,  title: str = None) -> Tuple[plt.Figure, plt.Axes]:
     """
     Create a custom heatmap from co-occurrence data.
     """
@@ -113,7 +163,7 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
     heatmap_ax.set_yticks(np.arange(len(cleaned_y_labels))+0.5)
     heatmap_ax.set_xticklabels(cleaned_x_labels, rotation=45, ha="right")
     heatmap_ax.set_yticklabels(cleaned_y_labels)
-    heatmap_ax.set_title("Co-occurrence of Enablers and Entries for Unlocks", fontsize=16)
+    heatmap_ax.set_title(title, fontsize=16)
     heatmap_ax.set_xlabel("Entries", fontsize=12)
     heatmap_ax.set_ylabel("Enablers", fontsize=12)
  # --- Legend --- 
@@ -144,15 +194,16 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
     legend_ax.set_ylim(0, 1)
 
     plt.tight_layout()
-    plt.close('all')
     return fig, heatmap_ax, legend_ax
 
 def create_and_save_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], 
-                            title: str, color_palette=None) -> None:
+                            output_file: str, color_palette=None, title: str = None) -> None:
     """
     Create, customize, and save the heatmap.
     """
-    fig, heatmap_ax, legend_ax = create_heatmap(co_occurrence_data, clusters, color_palette)
-    plt.savefig(title, dpi=300, bbox_inches="tight")
+    fig, heatmap_ax, legend_ax = create_heatmap(co_occurrence_data, clusters, color_palette, title= title)
+    
+       
+    plt.savefig(output_file, dpi=300, bbox_inches="tight")
     plt.close(fig)
-    print(f"Heatmap saved as {title}")
+    print(f"Heatmap saved as {output_file}")

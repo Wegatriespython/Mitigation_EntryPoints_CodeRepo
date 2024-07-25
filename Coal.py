@@ -7,9 +7,9 @@ from src.visualization.heatmap import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings
-INPUT_FILE = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Bioenergy.xlsm"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsBio_"
-HEATMAP_OUTPUT_PREFIX = "Bioenergy_Co_occurrence_heatmap_final"
+INPUT_FILE = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Coal_Clean.xlsm"
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsCoal_"
+HEATMAP_OUTPUT_PREFIX = "Coal_Co_occurrence_heatmap4"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -38,8 +38,8 @@ def main():
         ENABLER_COLUMN,
         ENTRY_COLUMN,
         CLUSTER_COLUMN,
-        10,  # n_enablers
-        10,  # n_entries
+        15,  # n_enablers
+        5,  # n_entries
         RF_RESULTS_FILE_PREFIX,
         cluster_specific= False,
         df=df
@@ -48,7 +48,7 @@ def main():
     top_entries = results['top_entries']
 
     # Run Co-occurrence Analysis
-    co_occurrence_data, enabler_importance, secular_enablers = run_co_occurrence_analysis(
+    co_occurrence_data, enabler_importance, secular_enablers  = run_co_occurrence_analysis(
         INPUT_FILE,
         ENABLER_COLUMN,
         ENTRY_COLUMN,
@@ -56,21 +56,15 @@ def main():
         top_enablers,
         top_entries
     )
-
     # Print secular enablers
     print(f"\nSecular Enablers:")
     for enabler in secular_enablers:
         print(f"- {enabler}")
-
     # Create and Save Heatmap
     output_dir = os.path.join(os.path.dirname(os.path.dirname(INPUT_FILE)), "output")
     os.makedirs(output_dir, exist_ok=True)
     heatmap_output = os.path.join(output_dir, f"{HEATMAP_OUTPUT_PREFIX}.png")
-
-    # Define the title for the heatmap
-    title = "Bioenergy Co-occurrence Heatmap"    
-    create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output, 
-                            color_palette=color_palette, title=title)
+    create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output, color_palette=color_palette, title="Coal Co-occurrence Heatmap")
 
 if __name__ == "__main__":
     main()
