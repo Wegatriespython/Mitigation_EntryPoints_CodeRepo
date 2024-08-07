@@ -27,6 +27,7 @@ def clean_labels(labels):
         'i_policy_environment': 'Policy Environment',
         't_risk': 'Risk',
         'e_feedin_premiums': 'Feed-in Premiums',
+        'e_cost_state': 'Fiscal Capacity',
         'e_tax_relief_supply_side': 'Supply-side Tax Relief',
         'e_market_financial': 'Financial Markets',
         'e_interest_rates': 'Interest Rates',
@@ -35,7 +36,7 @@ def clean_labels(labels):
         'e_market_creation': 'Market Formation',
         'e_rdd_funding': 'R&D Funding',
         'cl_coordinating_body_for_climate_strategy': 'Climate Strategy Coordination',
-        't_political_renewable_energy_target': 'RE Targets',	
+        't_political_renewable_energy_target': 'RE Targets',
         'i_political_system': 'Political System',
         's_interest_group_support': 'Interest Group Support',
         'i_institutional_capacity': 'Institutional Capacity',
@@ -81,6 +82,7 @@ def clean_labels(labels):
         'e_grants_and_subsidies': 'Grants and Subsidies',
         'r_obligation_schemes': 'Obligation Schemes',
         'e_carbon_price': 'Carbon Price',
+        'e_eu_ets': 'EU ETS',
         'p_strategic_planning': 'Strategic Planning',
         'e_state_loans': 'State Loans',
         'r_auditing': 'Auditing',
@@ -104,7 +106,7 @@ def clean_labels(labels):
         't_political_target': 'Coal Phase Out Target',
         'e_retirement_premium': 'Retirement Premiums',
         'b_removal_of_fossilfuel_subsidies': 'Fossil Fuel Subsidy Removal',
-        'r_procurement_rules_general': 'Renewable Portfolio Standards',  
+        'r_procurement_rules_general': 'Renewable Portfolio Standards',
         'e_green_certificates': 'Green Certificates',
         'e_infrastructure_investments': 'Infrastructure Investments',
         'com_narrative': 'Communication Narrative',
@@ -118,7 +120,7 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
     """
     # Filter co_occurrence_data to include only the specified clusters
     co_occurrence_data = co_occurrence_data[clusters]
-    fig = plt.figure(figsize=(24, 12))
+    fig = plt.figure(figsize=(12, 12))
     gs = fig.add_gridspec(1, 2, width_ratios=[1, 3])
 
     legend_ax = fig.add_subplot(gs[0])
@@ -129,7 +131,7 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
     # Use specified color palette or default
     if color_palette is None:
         color_palette = plt.cm.Set1(np.linspace(0, 1, max(9, n_clusters)))
-    
+
     base_colors = color_palette[:n_clusters]
 
     cluster_cmaps = [LinearSegmentedColormap.from_list("", ["white", color]) for color in base_colors]
@@ -176,7 +178,7 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
     heatmap_ax.set_title(title, fontsize=16)
     heatmap_ax.set_xlabel("Entries", fontsize=12)
     heatmap_ax.set_ylabel("Enablers", fontsize=12)
- # --- Legend --- 
+ # --- Legend ---
     legend_ax.axis("off")
     legend_ax.text(0.05, 0.95, "Legend", fontsize=16, fontweight="bold")
     legend_ax.text(
@@ -195,7 +197,7 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
         legend_ax.scatter(pos, 0.75, s=size, c="gray", edgecolor="black")
 
     legend_ax.text(0.05, 0.5, "Color: Cluster", fontsize=14)
-   
+
     for i, (cluster, color) in enumerate(zip(clusters, base_colors)):
         legend_ax.scatter(0.2, 0.4 - i * 0.1, s=900, c=[color], edgecolor="black")
         legend_ax.text(0.3, 0.4 - i * 0.1, cluster, fontsize=12, va="center")
@@ -206,14 +208,13 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
     plt.tight_layout()
     return fig, heatmap_ax, legend_ax
 
-def create_and_save_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], 
+def create_and_save_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str],
                             output_file: str, color_palette=None, title: str = None) -> None:
     """
     Create, customize, and save the heatmap.
     """
     fig, heatmap_ax, legend_ax = create_heatmap(co_occurrence_data, clusters, color_palette, title= title)
-    
-       
-    plt.savefig(output_file, dpi=300, bbox_inches="tight")
-    plt.close(fig)
+
+
+    plt.show()
     print(f"Heatmap saved as {output_file}")

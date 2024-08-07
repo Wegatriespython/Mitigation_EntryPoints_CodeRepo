@@ -7,9 +7,10 @@ from src.visualization.heatmap import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings
-INPUT_FILE = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Coal_Clean.xlsm"
+
+INPUT_FILE = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Copy of Codebook_Coal_Clean.xlsm"
 RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsCoal_"
-HEATMAP_OUTPUT_PREFIX = "Coal_Co_occurrence_heatmap4"
+HEATMAP_OUTPUT_PREFIX = "Coal_Co_occurrence_heatmap6"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -17,10 +18,10 @@ ENTRY_COLUMN = "Entry (policy intervention)"
 def main():
     # Load and Preprocess Data
     df, vectorized_data = load_and_preprocess(INPUT_FILE, ENABLER_COLUMN, ENTRY_COLUMN, CLUSTER_COLUMN)
-    
+
     # Calculate full co-occurrences
     co_occurrence_matrices = calculate_co_occurrence(df, vectorized_data, CLUSTER_COLUMN)
-    
+
 
     # Determine clusters
     clusters = df[CLUSTER_COLUMN].unique()
@@ -44,8 +45,8 @@ def main():
         RF_RESULTS_FILE_PREFIX,
         detailed= False,
         cluster_specific= False,
-        df=df       
-     
+        df=df
+
     )
     top_enablers = results['top_enablers']
     top_entries = results['top_entries']

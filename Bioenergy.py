@@ -7,7 +7,7 @@ from src.visualization.heatmap import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings
-INPUT_FILE = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Bioenergy.xlsm"
+INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Bioenergy.xlsm"
 RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsBio_"
 HEATMAP_OUTPUT_PREFIX = "Bioenergy_Co_occurrence_heatmap_final"
 CLUSTER_COLUMN = "Cluster"
