@@ -1,0 +1,15 @@
+sector,mitigation_option,count
+Energy (86.1%),Solar (39),39
+Energy (86.1%),Wind (30),30
+Energy (86.1%),RE (Wind and Solar) (14),14
+Energy (86.1%),Coal (14),14
+Energy (86.1%),Hydroelectricity (6),6
+Energy (86.1%),Bioenergy (19),19
+Energy (86.1%),Nuclear (1),1
+Energy (86.1%),Grid (1),1
+Buildings (3.5%),Passive House (2),2
+Buildings (3.5%),Heat Pumps (1),1
+Buildings (3.5%),Energy Efficiency (2),2
+Transport (9.0%),Electric Vehicles (12),12
+Transport (9.0%),Fuel Cell Cars (1),1
+Carbon Management (2),CCS (2),2

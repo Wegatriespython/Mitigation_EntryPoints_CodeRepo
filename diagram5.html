@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermaid Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <div class="mermaid">
+        %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffffff', 'textColor': '#000000', 'lineColor': '#000000' }}}%%
+        graph TD
+            A[Coal Phase-Out Clusters]
+            
+            A --> C1[Coal Dependent & Climate Advocate]
+            A --> C2[Liberalized & Coal Independent]
+            A --> C3[Financially Supported]
+            
+            C1 --> D1["Countries: Germany, Canada"]
+            C2 --> D2["Countries: United Kingdom"]
+            C3 --> D3["Countries: Vietnam"]
+            
+            D1 --> E1["Countries with significant coal usage but strong<br>international climate commitments. Environmental impact and proactive<br>climate standing drive policy pledges. Institutional capacity is built through<br>stakeholder commissions, with Germany using compensation payments<br>to reduce opposition."]
+            
+            D2 --> E2["Countries where coal usage has declined due to<br>a liberalized market, substitutability of gas, and lack of new investments<br>in coal power. Weak opposition to phase-out, supported by environmental<br>concerns, social activism, and international reputation."]
+            
+            D3 --> E3["Countries where international financial support enables<br>coal phase-out pledges. Limited financial capacity for new coal power<br>plants, making external funding crucial for transitioning away from coal."]
+    
+            classDef default fill:#ffffff,stroke:#000000,stroke-width:1px;
+            classDef central fill:#ffffff,stroke:#000000,stroke-width:3px;
+            classDef cluster fill:#ffffff,stroke:#000000,stroke-width:2px;
+    
+            class A central;
+            class C1,C2,C3,D1,D2,D3 cluster;
+    
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+</body>
+</html>

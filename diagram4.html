@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermaid Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <div class="mermaid">
+        %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffffff', 'textColor': '#000000', 'lineColor': '#000000' }}}%%
+        graph TD
+            A[Transport Clusters]
+            
+            A --> C1[Green Innovators]
+            A --> C2[Heavily State-Subsidized Transition]
+            A --> C3[Starters and Niche-Testers]
+            
+            C1 --> D1["Regions: Norway, Quebec, California"]
+            C2 --> D2["Regions: China"]
+            C3 --> D3["Regions: Estonia"]
+    
+            D1 --> E1["Regions with a high share of EV sales. Enabled by absence of a strong conventional<br>automotive industry, support coalitions, and skill spillovers. Policies include strong<br>ZEV deployment strategies, such as ICEV sales bans, motivated by emission<br>reduction and economic growth opportunities."]
+            
+            D2 --> E2["Characterized by the world’s highest absolute EV sales.<br>Driven by energy security, pollution concerns, and economic opportunities.<br>Policies focus on subsidies, R&D, and non-financial demand-side incentives,<br>including exemption from license plate lotteries in cities like Shanghai<br>and Shenzhen."]
+            
+            D3 --> E3["Early but limited EV adoption. Initial success driven<br>by extraordinary funding, strong public acceptance, and renewable energy<br>integration. Continued growth limited by lack of sustained financial support<br>and unclear future political strategies."]
+            
+            classDef default fill:#ffffff,stroke:#000000,stroke-width:1px;
+            classDef central fill:#ffffff,stroke:#000000,stroke-width:3px;
+            classDef cluster fill:#ffffff,stroke:#000000,stroke-width:2px;
+    
+            class A central;
+            class C1,C2,C3,D1,D2,D3 cluster;
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+</body>
+</html>

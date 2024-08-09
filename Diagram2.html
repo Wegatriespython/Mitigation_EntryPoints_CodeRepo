@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermaid Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <div class="mermaid">
+        %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffffff', 'textColor': '#000000', 'lineColor': '#000000' }}}%%
+        graph TD
+            A[Renewable Energy Clusters - Advanced Economies]
+            
+            A --> C1[Market Based]
+            A --> C2[Distributed Industrial Policy]
+            A --> C3[Regional Autonomy]
+            
+            C1 --> E1["Representative Regions : <br> United States, United Kingdom"]
+            C2 --> E2["Representative Regions: <br> Germany, Austria"]
+            C3 --> E3["Representative Regions: <br> Scotland, Italy, Sweden"]
+            
+            E1 --> D1["Liberal market economies prioritizing market efficiency.<br>Policies focus on creating favorable conditions for private<br>investment in RE. Key features include consumer-oriented<br>approaches, financial instruments (e.g., tax credits), and<br>credit market interventions. Outcomes often include diverse<br>sub-national implementation and market-driven RE growth."]
+            
+            E2 --> D2["Developed economies with strong environmental policies<br>and industrial bases. Approach balances industrial capacity<br>growth with increasing RE share. Policies feature balanced<br>stimulus and investment incentives, emphasizing distributed<br>economic benefits. Outcomes include steady RE growth<br>integrated with existing industrial strengths."]
+            
+            E3 --> D3["Decentralized political systems with significant sub-national<br>authority. Policy approach emphasizes local decision-making<br>and stakeholder engagement. Key features include policy<br>entrepreneurship, narrative construction, and land-use<br>planning. Outcomes often include tailored local solutions<br>but potential for uneven national progress."]
+            
+            classDef default fill:#ffffff,stroke:#000000,stroke-width:1px;
+            classDef central fill:#ffffff,stroke:#000000,stroke-width:3px;
+            classDef cluster fill:#ffffff,stroke:#000000,stroke-width:2px;
+            
+            class A central;
+            class C1,C2,C3 cluster;
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+</body>
+</html>

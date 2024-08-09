@@ -287,18 +287,6 @@ def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column
                                cluster_specific: bool = False
                                ) -> Dict:
     print("Starting run_random_forest_analysis")
-
-    # Check if output file exists and load results
-    if os.path.exists(output_file):
-        print(f"Loading results from {output_file}")
-        try:
-            results = joblib.load(output_file)
-            print("Results loaded successfully.")
-            return results
-        except Exception as e:
-            print(f"Error loading results: {e}")
-            print("Running analysis...")
-
     if df is None:
         print("Loading and preprocessing data")
         df, _ = load_and_preprocess(file_path, enabler_column, entry_column, cluster_column)

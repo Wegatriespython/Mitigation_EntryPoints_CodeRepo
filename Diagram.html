@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermaid Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <div class="mermaid">
+        %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffffff', 'textColor': '#000000', 'lineColor': '#000000' }}}%%
+        graph TD
+            A[Cluster Classification]
+            B[Economic Status]
+            C[Motivation]
+            D[Governance]
+
+            A --> B & C & D
+            B --> B1[Advanced] & B2[Intermediate] & B3[Emerging] 
+            C --> C1[Green] & C2[Co-Benefits] & C4[Strategic]
+            D --> D1[Centralized] & D2[Federal] & D3[Devolved]
+
+        
+            classDef default fill:#ffffff,stroke:#000000,stroke-width:1px;
+            classDef main fill:#ffffff,stroke:#000000,stroke-width:2px;
+            classDef central fill:#ffffff,stroke:#000000,stroke-width:3px;
+            
+            class A central;
+            class B,C,D main;
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+</body>
+</html>

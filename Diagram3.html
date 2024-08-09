@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermaid Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <div class="mermaid">
+        %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffffff', 'textColor': '#000000', 'lineColor': '#000000' }}}%%
+        graph TD
+            A[Renewable Energy Clusters - Intermediate <br> and Emerging Economies]
+            
+            A --> C1[Centralized Industrial Policy]
+            A --> C2[Financial Cross-Cutters]
+            A --> C3[Adaptive Pragmatists]
+
+            C1 --> E1["Representative Regions : <br> China, Vietnam, South Korea"]
+            C2 --> E2["Representative Regions: <br> Ghana, Senegal, California, Germany"]
+            C3 --> E3["Representative Regions: <br> India, South Africa, Brazil"]
+
+
+            E1 --> D1["Centrally planned or coordinated market economies. Policy<br>approach features top-down, targeted RE development often<br>linked to industrial policy. Characterized by rapid deployment,<br>high industry concentration, and state-directed investment.<br>Outcomes include fast RE growth but potential for uneven<br>development across technologies and regions."]
+            
+            E2 --> D2["Cross-cutting regions focusing on financial sector engagement in RE.<br>Policy approach centers on structuring capital flows and<br>risk mitigation. Key features include transnational financial<br>arrangements and emphasis on reducing capital costs. Outcomes<br>often include increased private sector participation and<br>innovative financing models."]
+            
+            E3 --> D3["Developing countries with significant resources but<br> nascent institutional capacity. Policy approach prioritizes<br>cost reduction and risk management. Features include the use<br>of auctions and adaptive policy learning. Outcomes typically<br>involve steady but cautious RE growth, with emphasis on<br>fiscal sustainability."]
+            
+            classDef default fill:#ffffff,stroke:#000000,stroke-width:1px;
+            classDef central fill:#ffffff,stroke:#000000,stroke-width:3px;
+            classDef cluster fill:#ffffff,stroke:#000000,stroke-width:2px;
+            
+            class A central;
+            class C1,C2,C3 cluster;
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+</body>
+</html>
