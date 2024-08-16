@@ -286,6 +286,8 @@ def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column
                                output_file: str, detailed: bool = False, df: pd.DataFrame = None,
                                cluster_specific: bool = False
                                ) -> Dict:
+
+
     print("Starting run_random_forest_analysis")
     if df is None:
         print("Loading and preprocessing data")

@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 # File paths and settings
 INPUT_FILE = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\REWindSolar.xlsx"
 RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_"
-HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_final150"
+HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_final156"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -47,7 +47,7 @@ def main():
         df_batch = df[df[CLUSTER_COLUMN].isin(batch_clusters)].copy()
 
         if batch_idx == 0:
-            n_enablers = 9
+            n_enablers = 12
             n_entries = 12
             detailed2 = True
             specific = False
