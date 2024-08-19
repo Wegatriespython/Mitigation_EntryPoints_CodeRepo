@@ -9,7 +9,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.analysis.Co_occurrence import run_co_occurrence_analysis, calculate_co_occurrence
 from src.data_processing.general_preprocessing import load_and_preprocess
-from src.visualization.heatmap import create_and_save_heatmap
+from visualization.heatmap_space_alt import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings

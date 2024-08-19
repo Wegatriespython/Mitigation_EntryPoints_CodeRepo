@@ -53,6 +53,7 @@ def clean_labels(labels):
         'e_fiscal_latitude': 'Fiscal Latitude',
         'e_feedin_tariffs': 'Feed-in Tariffs',
         'e_costs' : 'Costs',
+        'e_eu_ets': 'EU ETS',
         't_substitutability': 'Substitutability',
         'i_professional_training_and_qualification': 'Professional Training',
         's_land_use_consenting': 'Land Use Consenting',
@@ -168,10 +169,8 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
                             color = cluster_cmaps[k](normalized_value)
                             size = max(100, min(1000, 1000 * (value / max_co_occurrence)))
                             # Adjust the x-position to be closer to the center
-                            x_position = j + 0.5 + (k - (n_clusters - 1) / 2) * 0.02
-
                             heatmap_ax.scatter(
-                                x_position,
+                                j + (k + 1) / (n_clusters + 1),
                                 i + 0.5,
                                 s=size,
                                 color=color,

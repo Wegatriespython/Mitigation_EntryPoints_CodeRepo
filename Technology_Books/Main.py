@@ -1,6 +1,6 @@
 from src.analysis.random_forest import run_random_forest_analysis
 from src.analysis.Co_occurrence import run_co_occurrence_analysis
-from src.visualization.heatmap import create_and_save_heatmap
+from visualization.heatmap_space_alt import create_and_save_heatmap
 
 def main():
     # Configuration

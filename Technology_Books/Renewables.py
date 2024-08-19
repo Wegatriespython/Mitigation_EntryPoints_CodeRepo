@@ -5,7 +5,7 @@ from itertools import combinations
 from src.analysis.Co_occurrence import run_co_occurrence_analysis
 from src.analysis.Co_occurrence import calculate_co_occurrence
 from src.data_processing.general_preprocessing import load_and_preprocess
-from src.visualization.heatmap import create_and_save_heatmap
+from visualization.heatmap import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
 from src.analysis.Co_occurrence import get_bisection_data
 from sklearn.metrics.pairwise import cosine_similarity
