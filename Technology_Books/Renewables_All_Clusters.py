@@ -1,11 +1,13 @@
 import numpy as np
 import os
-from scipy.spatial.distance import pdist, squareform
-from itertools import combinations
+
+import sys
+# Add the parent directory to sys.path to allow imports from src
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.analysis.Co_occurrence import run_co_occurrence_analysis
 from src.analysis.Co_occurrence import calculate_co_occurrence
 from src.data_processing.general_preprocessing import load_and_preprocess
-from heatmap_big import create_and_save_heatmap
+from src.visualization.heatmap_big import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
 from src.analysis.Co_occurrence import get_bisection_data
 from sklearn.metrics.pairwise import cosine_similarity

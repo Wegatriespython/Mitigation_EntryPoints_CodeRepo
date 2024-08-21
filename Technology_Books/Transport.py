@@ -1,6 +1,9 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
+# Add the parent directory to sys.path to allow imports from src
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.analysis.Co_occurrence import run_co_occurrence_analysis, calculate_co_occurrence, get_bisection_data, count_features
 from src.data_processing.general_preprocessing import load_and_preprocess
 from visualization.heatmap import create_and_save_heatmap
