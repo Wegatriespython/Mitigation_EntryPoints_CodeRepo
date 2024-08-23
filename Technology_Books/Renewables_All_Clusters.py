@@ -14,9 +14,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 import matplotlib.pyplot as plt
 
 # File paths and settings
-INPUT_FILE = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\REWindSolar.xlsx"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_"
-HEATMAP_OUTPUT_PREFIX = "WindSolar_Co_occurrence_heatmap_all_clusters9"
+INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\REWindSolar.xlsx"
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_ALL_S"
+HEATMAP_OUTPUT_PREFIX = "WindSolar_Co_occurrence_heatmap_all_clusters96"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -61,8 +61,8 @@ def main():
         20,  # n_enablers
         20,  # n_entries
         RF_RESULTS_FILE_PREFIX,
-        detailed=True,
-        cluster_specific=False,
+        detailed=False,
+        cluster_specific=True,
         df=df
     )
     top_enablers = results['top_enablers']
@@ -77,7 +77,7 @@ def main():
         top_enablers,
         top_entries
     )
-
+    print(top_enablers, top_entries)
     # Print secular enablers
     print(f"\nSecular Enablers:")
     for enabler in secular_enablers:
@@ -91,7 +91,7 @@ def main():
     # Define the title for the heatmap
     title = "Wind & Solar Entry Points for Unlocks - All Clusters"
     create_and_save_heatmap(co_occurrence_data, cluster_order, heatmap_output,
-                            color_palette=color_palette, title=title)
+                            color_palette=color_palette, title=title, threshold=4)
 
 if __name__ == "__main__":
     main()

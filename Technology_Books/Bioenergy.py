@@ -11,8 +11,8 @@ from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings
 INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Bioenergy.xlsm"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsBio_det"
-HEATMAP_OUTPUT_PREFIX = "Bioenergy_Co_occurrence_heatmap_final14"
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsBio_detS"
+HEATMAP_OUTPUT_PREFIX = "Bioenergy_Co_occurrence_heatmap_finalS1"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -74,7 +74,7 @@ def main():
     # Define the title for the heatmap
     title = "Bioenergy Entry Points for Unlocks"    
     create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output, 
-                            color_palette=color_palette, title=title)
+                            color_palette=color_palette, title=title, threshold=2)
 
 if __name__ == "__main__":
     main()

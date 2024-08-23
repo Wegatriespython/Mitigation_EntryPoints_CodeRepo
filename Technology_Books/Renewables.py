@@ -8,14 +8,13 @@ from src.analysis.Co_occurrence import calculate_co_occurrence
 from src.data_processing.general_preprocessing import load_and_preprocess
 from src.visualization.heatmap import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
-from src.analysis.Co_occurrence import get_bisection_data
-from sklearn.metrics.pairwise import cosine_similarity
+
 import matplotlib.pyplot as plt
 
 # File paths and settings
-INPUT_FILE = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\REWindSolar.xlsx"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_"
-HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_final156"
+INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\REWindSolar.xlsx"
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_12"
+HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_final_V2"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -44,19 +43,22 @@ def main():
 
     # Batch Analysis
     for batch_idx, batch_clusters in enumerate(cluster_batches):
+        RF_RESULTS_FILE_PREFIX = f"rf_analysis_resultsREV2{batch_idx + 1}_"
         print(f"\nProcessing Batch {batch_idx + 1}")
         df_batch = df[df[CLUSTER_COLUMN].isin(batch_clusters)].copy()
 
         if batch_idx == 0:
-            n_enablers = 12
+            n_enablers = 9
             n_entries = 12
             detailed2 = True
             specific = False
+            batch_Threshold = 2
         else:
-            n_enablers = 11
-            n_entries = 10
+            n_enablers = 15
+            n_entries = 15
             detailed2 = True
             specific = False
+            batch_Threshold = 4
 
         # Run Random Forest for the batch
         results = run_random_forest_analysis(
@@ -97,7 +99,7 @@ def main():
         print(f"Creating heatmap for Batch {batch_idx + 1}")
         print(f"Clusters in this batch: {batch_clusters}")
         create_and_save_heatmap(co_occurrence_data, batch_clusters, heatmap_output,
-                                color_palette=color_palette, title=title)
+                                color_palette=color_palette, title=title, threshold= batch_Threshold)
 
         # Print secular enablers for this batch
         print(f"\nSecular Enablers for Batch {batch_idx + 1}:")

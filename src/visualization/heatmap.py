@@ -121,13 +121,13 @@ def clean_labels(labels):
     }
     return [cleanup_dict.get(label, label) for label in labels]
 
-def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_palette=None,  title: str = None, threshold: int = 2) -> Tuple[plt.Figure, plt.Axes]:
+def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_palette=None,  title: str = None, threshold: int = 1) -> Tuple[plt.Figure, plt.Axes]:
     """
     Create a custom heatmap from co-occurrence data.
     """
     # Filter co_occurrence_data to include only the specified clusters
     co_occurrence_data = co_occurrence_data[clusters]
-    co_occurrence_data = co_occurrence_data[co_occurrence_data.max(axis=1) >= 2]
+    co_occurrence_data = co_occurrence_data[co_occurrence_data.max(axis=1) >= threshold]
     fig = plt.figure(figsize=(24, 12))
     gs = fig.add_gridspec(1, 2, width_ratios=[1, 3])
 
@@ -228,11 +228,11 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
     return fig, heatmap_ax, legend_ax
 
 def create_and_save_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str],
-                            output_file: str, color_palette=None, title: str = None) -> None:
+                            output_file: str, color_palette=None, title: str = None, threshold = 1) -> None:
     """
     Create, customize, and save the heatmap.
     """
-    fig, heatmap_ax, legend_ax = create_heatmap(co_occurrence_data, clusters, color_palette, title= title)
+    fig, heatmap_ax, legend_ax = create_heatmap(co_occurrence_data, clusters, color_palette, title= title, threshold=threshold)
 
 
     plt.savefig(output_file, dpi=300, bbox_inches="tight")

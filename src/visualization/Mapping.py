@@ -7,7 +7,7 @@ import plotly.io as pio
 
 # Read the Excel file into a DataFrame
 # Load the CSV file
-file_path = 'C:\\Users\\vigne\\OneDrive - Wageningen University & Research\\Internship\\Literature Review\\Final Data Processing\\Codebook_Omnibus_Extractions_Select_Columns_W_Duplicates.xlsx'
+file_path = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Codebook_Omnibus_Extractions_Select_Columns_W_Duplicates.xlsx"
 df = pd.read_excel(file_path)
 
 
@@ -17,15 +17,18 @@ subnational_mapping = {
     "Ontario": ["Ontario"],  # Province in Canada
     "Québec": ["Québec"],  # Province in Canada
     "Tokyo": ["Tokyo"],  # Prefecture in Japan
-    "Scotland": ["Aberdeen City", "Aberdeenshire", "Angus", "Argyll and Bute", "Clackmannanshire", "Dumfries and Galloway",
-                 "Dundee City", "East Ayrshire", "East Dunbartonshire", "East Lothian", "East Renfrewshire", "Edinburgh, City of",
-                 "Falkirk", "Fife", "Glasgow City", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eileanan Siar",
-                 "North Ayrshire", "North Lanarkshire", "Orkney Islands", "Perth and Kinross", "Renfrewshire", "Scottish Borders",
-                 "Shetland Islands", "South Ayrshire", "South Lanarkshire", "Stirling", "West Dunbartonshire", "West Lothian"],  # Council areas in Scotland
-    "Apulia": ["Bari", "Barletta-Andria-Trani", "Brindisi", "Foggia", "Lecce", "Taranto"],  # Provinces in Apulia, Italy
-    "Tuscany": ["Arezzo", "Florence", "Grosseto", "Livorno", "Lucca", "Massa-Carrara", "Pisa", "Pistoia", "Prato", "Siena"],  # Provinces in Tuscany, Italy
+    "Scotland": ["Aberdeen", "Aberdeenshire", "Angus", "Argyll and Bute", "Clackmannanshire", 
+                 "Dumfries and Galloway", "Dundee", "East Ayrshire", "East Dunbartonshire", 
+                 "East Lothian", "East Renfrewshire", "Edinburgh", "Falkirk", "Fife", 
+                 "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Eilean Siar", 
+                 "North Ayshire", "North Lanarkshire", "Orkney", "Perthshire and Kinross", 
+                 "Renfrewshire", "Scottish Borders", "Shetland Islands", "South Ayrshire", 
+                 "South Lanarkshire", "Stirling", "West Dunbartonshire", "West Lothian"],
+    "Apulia": ["Bari", "Barletta-Andria Trani", "Brindisi", "Foggia", "Lecce", "Taranto"],  # Provinces in Apulia, Italy
+    "Tuscany": ["Arezzo", "Firenze", "Grosseto", "Livorno", "Lucca", "Massa-Carrara", 
+                "Pisa", "Pistoia", "Prato", "Siena"],  # Provinces in Tuscany, Italy
     "Shanghai": ["Shanghai"],  # Municipality in China
-    "Shenzhen": ["Shenzhen"],  # City in China
+    "Shenzhen": ["Guangdong"],  # City in Guangdong province, China
     "Anhui Province": ["Anhui"],  # Province in China
     "Jiangxi Province": ["Jiangxi"],  # Province in China
 }
@@ -64,7 +67,7 @@ region_counts_df.columns = ['research_geography', 'count']
 region_counts_df = region_counts_df.sort_values('count', ascending=False)
 
 # Load the world map data from the local file
-world = gpd.read_file("ne_50m_admin_0_countries/ne_50m_admin_0_countries.shp")
+world = gpd.read_file(r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\ne_50m_admin_0_countries\ne_50m_admin_0_countries.shp")
 
 # Ensure country names match between your data and the shapefile
 world['NAME'] = world['NAME'].replace({
@@ -78,7 +81,7 @@ world['NAME'] = world['NAME'].replace({
 world['count'] = world['NAME'].map(region_counts).fillna(0)
 
 # Load the states map data from the local file
-states = gpd.read_file("ne_10m_admin_1_states_provinces/ne_10m_admin_1_states_provinces.shp")
+states = gpd.read_file(r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\ne_10m_admin_1_states_provinces\ne_10m_admin_1_states_provinces.shp")
 
 # Add count column to states for subnational regions
 states['count'] = states['name'].map(lambda x: region_counts.get(x, 0))
@@ -150,6 +153,6 @@ fig.update_layout(
     margin={"r":0,"t":30,"l":0,"b":0},
 )
 # Save the figure as an interactive HTML file
-fig.write_html("final_global_research_frequency_map3.html")
+fig.write_html("final_global_research_frequency_map4.html")
 
 print("\nInteractive map has been saved as 'final_global_research_frequency_map.html'")

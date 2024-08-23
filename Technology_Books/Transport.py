@@ -6,13 +6,13 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.analysis.Co_occurrence import run_co_occurrence_analysis, calculate_co_occurrence, get_bisection_data, count_features
 from src.data_processing.general_preprocessing import load_and_preprocess
-from visualization.heatmap import create_and_save_heatmap
+from src.visualization.heatmap import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings
-INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Transport.xlsm"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsTransport_"
-HEATMAP_OUTPUT_PREFIX = "Transport_Co_occurrence_heatmap_final2"
+INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Transport(1).xlsm"
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsTransport_det"
+HEATMAP_OUTPUT_PREFIX = "Transport_Co_occurrence_heatmap_final4"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -45,7 +45,7 @@ def main():
         10,  # n_enablers
         10,  # n_entries
         RF_RESULTS_FILE_PREFIX,
-        detailed= True,
+        detailed= False,
         cluster_specific= False,
         df=df
         
@@ -76,7 +76,7 @@ def main():
     # Define the title for the heatmap
     title = "Transport Entry Points for Unlocks"    
     create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output, 
-                            color_palette=color_palette, title=title)
+                            color_palette=color_palette, title=title, threshold=1)
 
 if __name__ == "__main__":
     main()

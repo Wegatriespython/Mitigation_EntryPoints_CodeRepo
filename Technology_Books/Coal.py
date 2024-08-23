@@ -6,14 +6,14 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.analysis.Co_occurrence import run_co_occurrence_analysis, calculate_co_occurrence, get_bisection_data, count_features
 from src.data_processing.general_preprocessing import load_and_preprocess
-from visualization.heatmap import create_and_save_heatmap
+from src.visualization.heatmap import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings
 
-INPUT_FILE = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Copy of Codebook_Coal_Clean.xlsm"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsCoal_"
-HEATMAP_OUTPUT_PREFIX = "Coal_Co_occurrence_heatmap6"
+INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Coal_Cleanv2.xlsm"
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsCoal_2"
+HEATMAP_OUTPUT_PREFIX = "Coal_Co_occurrence_heatmap10"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -71,7 +71,7 @@ def main():
     output_dir = os.path.join(os.path.dirname(os.path.dirname(INPUT_FILE)), "output")
     os.makedirs(output_dir, exist_ok=True)
     heatmap_output = os.path.join(output_dir, f"{HEATMAP_OUTPUT_PREFIX}.png")
-    create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output, color_palette=color_palette, title="Coal Entry Points for Unlocks")
+    create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output, color_palette=color_palette, title="Coal Entry Points for Unlocks", threshold=1)
 
 if __name__ == "__main__":
     main()

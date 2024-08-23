@@ -11,8 +11,8 @@ from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings
 INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_BuildingsV1.xlsm"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsBuildings_det"
-HEATMAP_OUTPUT_PREFIX = "Buildings_Co_occurrence_heatmap_final18"
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsBuildings_detS"
+HEATMAP_OUTPUT_PREFIX = "Buildings_Co_occurrence_heatmap_finalS"
 CLUSTER_COLUMN = "technology_mitigation_option"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"

@@ -53,6 +53,7 @@ def clean_labels(labels):
         'i_political_system': 'Political System',
         's_interest_group_support': 'Interest Group Support',
         'i_institutional_capacity': 'Institutional Capacity',
+        'r_monitoring': 'Monitoring',
         's_public_acceptance': 'Public Acceptance',
         't_transfer': 'Transfer',
         'i_policy': 'Policy Environment',
@@ -132,12 +133,13 @@ def clean_labels(labels):
     }
     return [cleanup_dict.get(label, label) for label in labels]
 
-def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_palette=None, title: str = None) -> Tuple[plt.Figure, plt.Axes]:
+def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_palette=None,  title: str = None, threshold: int = 1) -> Tuple[plt.Figure, plt.Axes]:
     """
     Create a custom heatmap from co-occurrence data.
     """
     # Filter co_occurrence_data to include only the specified clusters
     co_occurrence_data = co_occurrence_data[clusters]
+
     fig = plt.figure(figsize=(24, 12))
     gs = fig.add_gridspec(1, 2, width_ratios=[1, 3])
 
@@ -165,26 +167,26 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
     for i, enabler in enumerate(enablers):
         for j, entry in enumerate(entries):
             values = co_occurrence_data.loc[(enabler, entry)].values
+            if any(v >= threshold for v in values):
+                if sum(v > 0 for v in values) >= 5:
+                    heatmap_ax.add_patch(plt.Rectangle((j, i), 1, 1, fill=True, facecolor="lightgray", edgecolor="none"))
 
-            if sum(v > 0 for v in values) >= 5:
-                heatmap_ax.add_patch(plt.Rectangle((j, i), 1, 1, fill=True, facecolor="lightgray", edgecolor="none"))
+                for k, value in enumerate(values):
+                    if value > 0:
+                        # Normalize the value relative to the cluster's highest co-occurrence
+                        normalized_value = value / cluster_max_values[clusters[k]]
 
-            for k, value in enumerate(values):
-                if value > 0:
-                    # Normalize the value relative to the cluster's highest co-occurrence
-                    normalized_value = value / cluster_max_values[clusters[k]]
-
-                    color = cluster_cmaps[k](normalized_value)
-                    size = max(100, min(1000, 1000 * (value / max_co_occurrence)))
-                    heatmap_ax.scatter(
-                        j + (k + 1) / (n_clusters + 1),
-                        i + 0.5,
-                        s=size,
-                        color=color,
-                        edgecolor="black",
-                        linewidth=0.5,
-                    )
-
+                        color = cluster_cmaps[k](normalized_value)
+                        size = max(100, min(1000, 1000 * (value / max_co_occurrence)))
+                        heatmap_ax.scatter(
+                            j + (k + 1) / (n_clusters + 1),
+                            i + 0.5,
+                            s=size,
+                            color=color,
+                            edgecolor="black",
+                            linewidth=0.5,
+                        )
+    legend_ax.text(0.05, 0.3, f"Only co-occurrences ≥ {threshold} are plotted", fontsize=12, fontweight='bold')
     # Clean and set labels
     cleaned_x_labels = clean_labels(entries)
     cleaned_y_labels = clean_labels(enablers)
@@ -216,11 +218,11 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
     return fig, heatmap_ax, legend_ax
 
 def create_and_save_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str],
-                            output_file: str, color_palette=None, title: str = None) -> None:
+                            output_file: str, color_palette=None, title: str = None, threshold = 1) -> None:
     """
     Create, customize, and save the heatmap.
     """
-    fig, heatmap_ax, legend_ax = create_heatmap(co_occurrence_data, clusters, color_palette, title=title)
+    fig, heatmap_ax, legend_ax = create_heatmap(co_occurrence_data, clusters, color_palette, title=title, threshold=threshold)
 
     plt.savefig(output_file, dpi=300, bbox_inches="tight")
     plt.close(fig)
