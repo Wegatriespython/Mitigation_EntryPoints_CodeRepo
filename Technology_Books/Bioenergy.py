@@ -11,8 +11,8 @@ from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings
 INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Bioenergy.xlsm"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsBio_detS"
-HEATMAP_OUTPUT_PREFIX = "Bioenergy_Co_occurrence_heatmap_finalS1"
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsBio_det_S"
+HEATMAP_OUTPUT_PREFIX = "Bioenergy_Co_occurrence_heatmap_final_S"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -46,8 +46,9 @@ def main():
         RF_RESULTS_FILE_PREFIX,
         detailed= True,
         cluster_specific= False,
-        df=df
-    )
+        df=df,
+        feature_selection_method=''
+        )
     top_enablers = results['top_enablers']
     top_entries = results['top_entries']
 

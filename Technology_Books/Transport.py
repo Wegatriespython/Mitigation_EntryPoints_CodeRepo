@@ -11,8 +11,8 @@ from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings
 INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Transport(1).xlsm"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsTransport_det"
-HEATMAP_OUTPUT_PREFIX = "Transport_Co_occurrence_heatmap_final4"
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsTransport_det_"
+HEATMAP_OUTPUT_PREFIX = "Transport_Co_occurrence_heatmap_final_"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -47,7 +47,8 @@ def main():
         RF_RESULTS_FILE_PREFIX,
         detailed= False,
         cluster_specific= False,
-        df=df
+        df=df,
+        feature_selection_method=''
         
     )
     top_enablers = results['top_enablers']

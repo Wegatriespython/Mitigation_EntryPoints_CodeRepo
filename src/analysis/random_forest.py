@@ -10,6 +10,8 @@ from imblearn.over_sampling import RandomOverSampler
 from imblearn.over_sampling import SMOTE
 from sklearn.utils.class_weight import compute_class_weight
 import joblib
+from sklearn.feature_selection import RFE
+from boruta import BorutaPy
 from collections import Counter
 from typing import Dict, List, Tuple, Union
 from src.data_processing.general_preprocessing import load_and_preprocess
@@ -280,12 +282,23 @@ def aggregate_cluster_results(cluster_importances: Dict[str, pd.DataFrame],
 
     print("Finished aggregate_cluster_results function")
     return results
+def boruta_feature_selection(X: np.ndarray, y: np.ndarray, n_estimators: int = 100) -> List[int]:
+    rf = RandomForestClassifier(n_estimators=n_estimators, random_state=42)
+    boruta_selector = BorutaPy(rf, n_estimators='auto', verbose=2, random_state=42)
+    boruta_selector.fit(X, y)
+    return list(np.where(boruta_selector.support_)[0])
+
+def rfe_feature_selection(X: np.ndarray, y: np.ndarray, n_features_to_select: int, step: int = 1) -> List[int]:
+    rf = RandomForestClassifier(n_estimators=100, random_state=42)
+    rfe_selector = RFE(estimator=rf, n_features_to_select=n_features_to_select, step=step)
+    rfe_selector = rfe_selector.fit(X, y)
+    return list(np.where(rfe_selector.support_)[0])
 
 def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column: str,
                                cluster_column: str, n_enablers: int, n_entries: int,
                                output_file: str, detailed: bool = False, df: pd.DataFrame = None,
-                               cluster_specific: bool = False
-                               ) -> Dict:
+                               cluster_specific: bool = False,
+                               feature_selection_method: str = 'default') -> Dict:
 
     # Check if output file exists and load results
     if os.path.exists(output_file):
@@ -320,19 +333,28 @@ def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column
         cluster_sizes = {cluster: np.sum(y == i) for i, cluster in enumerate(cluster_names)}
         results = aggregate_cluster_results(cluster_importances, n_enablers, n_entries, cluster_sizes)
     else:
+        print(f"Running feature selection: {feature_selection_method}")
+        if feature_selection_method == 'boruta':
+            selected_features = boruta_feature_selection(feature_matrix, y)
+        elif feature_selection_method == 'rfe':
+            selected_features = rfe_feature_selection(feature_matrix, y, n_enablers + n_entries)
+        else:
+            selected_features = list(range(feature_matrix.shape[1]))  # Use all features
+
+        feature_matrix_selected = feature_matrix[:, selected_features]
+        feature_names_selected = [feature_names[i] for i in selected_features]
+
         print("Running regular random forest")
-        random_search = train_random_forest(feature_matrix, y, detailed)
+        random_search = train_random_forest(feature_matrix_selected, y, detailed)
         importances = random_search.best_estimator_.feature_importances_
         feature_imp = pd.DataFrame({
-            'feature': feature_names,
+            'feature': feature_names_selected,
             'importance': importances,
-            'type': ['Enabler' if i < len(enabler_features) else 'Entry' for i in range(len(feature_names))]
+            'type': ['Enabler' if feature_names[i] in enabler_features else 'Entry' for i in selected_features]
         })
         feature_imp = feature_imp.sort_values(by='importance', ascending=False)
 
         print("Selecting top features")
-
-
         top_enablers = get_top_features(feature_imp, 'Enabler', n_enablers)
         top_entries = get_top_features(feature_imp, 'Entry', n_entries)
 

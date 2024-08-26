@@ -13,8 +13,8 @@ import matplotlib.pyplot as plt
 
 # File paths and settings
 INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\REWindSolar.xlsx"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_12"
-HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_final_V2"
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_"
+HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_final_"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -43,7 +43,7 @@ def main():
 
     # Batch Analysis
     for batch_idx, batch_clusters in enumerate(cluster_batches):
-        RF_RESULTS_FILE_PREFIX = f"rf_analysis_resultsREV2{batch_idx + 1}_"
+        RF_RESULTS_FILE_PREFIX = f"rf_analysis_results_{batch_idx + 1}_"
         print(f"\nProcessing Batch {batch_idx + 1}")
         df_batch = df[df[CLUSTER_COLUMN].isin(batch_clusters)].copy()
 
@@ -71,7 +71,8 @@ def main():
             RF_RESULTS_FILE_PREFIX,
             detailed=detailed2,
             cluster_specific=specific,
-            df=df_batch
+            df=df_batch,
+            feature_selection_method='' 
         )
         top_enablers = results['top_enablers']
         top_entries = results['top_entries']

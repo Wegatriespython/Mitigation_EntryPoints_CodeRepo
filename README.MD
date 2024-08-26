@@ -53,9 +53,10 @@ root/
 
 ## Customization
 
-- You can adjust the number of top enablers and entries to analyze by modifying the `n_enablers` and `n_entries` parameters in the sector-specific files.
-- The `detailed` and `cluster_specific` parameters in the `run_random_forest_analysis` function can be toggled to change the analysis approach.
+- You can adjust the number of top enablers and entries to analyze by modifying the `n_enablers` and `n_entries` parameters in the sector-specific files. This alters the behaviour of the random forest model, as it trains per the number of total features(number of enablers plus entries). Diminishing returns past 12 observed. 
+- The `detailed` and `cluster_specific` parameters in the `run_random_forest_analysis` function can be toggled to change the analysis approach. Detailed ensures class balanced sampling when clusters sizes are unbalanced. It works best where one cluster is substantially bigger than the others. Cluster speicific on the other hand trains a random forest model for each cluster specifically. In theory this extracts more cluster specific features per cluster than the other approaches, however it requires large cluster populations, works for some of the clusters in Renewables but not so good for the smaller clusters. Cluster-Specific cannot be used in conjuction with detailed. 
 - Color palettes for heatmaps can be customized in the sector-specific files.
+- Threshold can be altered in heatmap to plot co-occurances lower than the threshold value. In general heatmap is safer to edit and alter than the other files, as it is purely post-processing. 
 
 ## Output
 
