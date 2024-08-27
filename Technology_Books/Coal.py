@@ -12,22 +12,24 @@ from src.analysis.random_forest import run_random_forest_analysis
 # File paths and settings
 
 INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Coal_Cleanv2.xlsm"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsCoal_2"
-HEATMAP_OUTPUT_PREFIX = "Coal_Co_occurrence_heatmap10"
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsCoal_new"
+HEATMAP_OUTPUT_PREFIX = "Coal_Co_occurrence_heatmap_new"
 CLUSTER_COLUMN = "Cluster"
+Cluster_columnB = "ClusterB"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
 
 def main():
     # Load and Preprocess Data
     df, vectorized_data = load_and_preprocess(INPUT_FILE, ENABLER_COLUMN, ENTRY_COLUMN, CLUSTER_COLUMN)
+    dfb, vectorized_datab = load_and_preprocess(INPUT_FILE, ENABLER_COLUMN, ENTRY_COLUMN, Cluster_columnB)
 
     # Calculate full co-occurrences
     co_occurrence_matrices = calculate_co_occurrence(df, vectorized_data, CLUSTER_COLUMN)
 
-
     # Determine clusters
     clusters = df[CLUSTER_COLUMN].unique()
+    clustersb = df[Cluster_columnB].unique()	
     print(f"Clusters: {clusters}")
     print(f"Number of clusters: {len(clusters)}")
 
@@ -48,7 +50,8 @@ def main():
         RF_RESULTS_FILE_PREFIX,
         detailed= False,
         cluster_specific= False,
-        df=df
+        df=df,
+        feature_selection_method=''
 
     )
     top_enablers = results['top_enablers']
@@ -59,7 +62,7 @@ def main():
         INPUT_FILE,
         ENABLER_COLUMN,
         ENTRY_COLUMN,
-        CLUSTER_COLUMN,
+        Cluster_columnB,
         top_enablers,
         top_entries
     )
@@ -71,7 +74,7 @@ def main():
     output_dir = os.path.join(os.path.dirname(os.path.dirname(INPUT_FILE)), "output")
     os.makedirs(output_dir, exist_ok=True)
     heatmap_output = os.path.join(output_dir, f"{HEATMAP_OUTPUT_PREFIX}.png")
-    create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output, color_palette=color_palette, title="Coal Entry Points for Unlocks", threshold=1)
+    create_and_save_heatmap(co_occurrence_data, clustersb, heatmap_output, color_palette=color_palette, title="Coal Entry Points for Unlocks", threshold=1)
 
 if __name__ == "__main__":
     main()

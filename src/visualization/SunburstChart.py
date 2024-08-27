@@ -22,7 +22,8 @@ def clean_label(text: str) -> str:
         "fuel_cell_cars_(FCEV)": "Fuel Cell Cars",
         "Behind-the-meter (BTM) energy storage": "Behind-the-meter Energy Storage",
         "Behind-the-meter energy storage": "Behind-the-meter Energy Storage",
-        "renewables (Wind and Solar)" : "RE (Wind and Solar)"
+        "Rewind-solar" : "RE(Wind and Solar)",
+        "carbon_management": "Carbon Mgmt",
     }
 
     for old, new in replacements.items():
@@ -69,21 +70,20 @@ def prepare_sunburst_data(counted_data: Dict[str, Dict[str, int]]) -> List[Dict[
     total_count = sum(sum(options.values()) for options in counted_data.values())
 
     for sector, options in counted_data.items():
+        print(sector, options)
         sector_total = sum(options.values())
         sector_percentage = (sector_total / total_count) * 100
 
-        # Determine if we should show percentage or count
-        if sector in ['Energy', 'Transport', 'Buildings']:
-            sector_label = f"{sector} ({sector_percentage:.1f}%)"
-        else:
-            sector_label = f"{sector} ({sector_total})"
+
+        sector_label = f"{sector} ({sector_percentage:.1f}%)"
+
 
         for option, count in options.items():
             # Correct capitalization for CCS
             if option.lower() == "ccs":
                 option = "CCS"
-            elif option.lower() in ["re wind and solar", "renewables wind and solar"]:
-                option = "RE (Wind and Solar)"
+            elif option.lower() in ["rewind-solar", "RE(Wind-Solar)"]:
+                option = "RE(Wind and Solar)"
 
             sunburst_data.append({
                 'sector': sector_label,
@@ -139,7 +139,7 @@ def create_sunburst_chart(nested_freq_table: pd.DataFrame) -> px.sunburst:
 def main():
     try:
         # Load the CSV file
-        file_path = "C:/Users/vigne/OneDrive - Wageningen University & Research/Internship/Literature Review/Final Data Processing/Omnibus Generator/Updated_Merged_Codebook.xlsx"
+        file_path = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Omnibus_Global_Technologies.xlsx"
         data = pd.read_excel(file_path)
         logging.info(f"Successfully loaded data from {file_path}")
 
