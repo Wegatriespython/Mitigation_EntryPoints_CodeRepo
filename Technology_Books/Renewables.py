@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import sys
+
 # Add the parent directory to sys.path to allow imports from src
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.analysis.Co_occurrence import run_co_occurrence_analysis
@@ -12,9 +13,15 @@ from src.analysis.random_forest import run_random_forest_analysis
 import matplotlib.pyplot as plt
 
 # File paths and settings
-INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\REWindSolar.xlsx"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_"
-HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_final_"
+
+file_name = "REWindSolar.xlsx"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go up one level to the parent directory
+parent_dir = os.path.dirname(script_dir)
+INPUT_FILE = os.path.join(parent_dir, "data", "raw", file_name)
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_12"
+HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_final_V2_222"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -42,8 +49,9 @@ def main():
     color_palette2 = plt.cm.Set2(np.linspace(0, 1, 8))
 
     # Batch Analysis
+    # rf_analysis_resultsREV2_@
     for batch_idx, batch_clusters in enumerate(cluster_batches):
-        RF_RESULTS_FILE_PREFIX = f"rf_analysis_results_{batch_idx + 1}_"
+        RF_RESULTS_FILE_PREFIX = f"rf_analysis_resultsREV2_@#{batch_idx + 1}_"
         print(f"\nProcessing Batch {batch_idx + 1}")
         df_batch = df[df[CLUSTER_COLUMN].isin(batch_clusters)].copy()
 
@@ -71,8 +79,7 @@ def main():
             RF_RESULTS_FILE_PREFIX,
             detailed=detailed2,
             cluster_specific=specific,
-            df=df_batch,
-            feature_selection_method='' 
+            df=df_batch
         )
         top_enablers = results['top_enablers']
         top_entries = results['top_entries']

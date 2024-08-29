@@ -14,9 +14,14 @@ from sklearn.metrics.pairwise import cosine_similarity
 import matplotlib.pyplot as plt
 
 # File paths and settings
-INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\REWindSolar.xlsx"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_ALL_S"
-HEATMAP_OUTPUT_PREFIX = "WindSolar_Co_occurrence_heatmap_all_clusters96"
+file_name = "REWindSolar.xlsx"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go up one level to the parent directory
+parent_dir = os.path.dirname(script_dir)
+INPUT_FILE = os.path.join(parent_dir, "data", "raw", file_name)
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_ALL_S2"
+HEATMAP_OUTPUT_PREFIX = "WindSolar_Co_occurrence_heatmap_all_clusters_102"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -91,7 +96,7 @@ def main():
     # Define the title for the heatmap
     title = "Wind & Solar Entry Points for Unlocks - All Clusters"
     create_and_save_heatmap(co_occurrence_data, cluster_order, heatmap_output,
-                            color_palette=color_palette, title=title, threshold=4)
+                            color_palette=color_palette, title=title, threshold=3)
 
 if __name__ == "__main__":
     main()

@@ -10,10 +10,14 @@ from src.visualization.heatmap import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings
+file_name = "Codebook_Coal_Cleanv2.xlsm"
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
-INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Coal_Cleanv2.xlsm"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsCoal_new"
-HEATMAP_OUTPUT_PREFIX = "Coal_Co_occurrence_heatmap_new"
+# Go up one level to the parent directory
+parent_dir = os.path.dirname(script_dir)
+INPUT_FILE = os.path.join(parent_dir, "data", "raw", file_name)
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsCoal"
+HEATMAP_OUTPUT_PREFIX = "Coal_Co_occurrence_heatmap"
 CLUSTER_COLUMN = "Cluster"
 Cluster_columnB = "ClusterB"
 ENABLER_COLUMN = "Enabler"
@@ -29,7 +33,7 @@ def main():
 
     # Determine clusters
     clusters = df[CLUSTER_COLUMN].unique()
-    clustersb = df[Cluster_columnB].unique()	
+    clustersb = df[Cluster_columnB].unique()
     print(f"Clusters: {clusters}")
     print(f"Number of clusters: {len(clusters)}")
 
@@ -51,7 +55,6 @@ def main():
         detailed= False,
         cluster_specific= False,
         df=df,
-        feature_selection_method=''
 
     )
     top_enablers = results['top_enablers']

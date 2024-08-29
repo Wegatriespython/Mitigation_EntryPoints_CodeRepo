@@ -9,12 +9,17 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.analysis.Co_occurrence import run_co_occurrence_analysis, calculate_co_occurrence
 from src.data_processing.general_preprocessing import load_and_preprocess
-from visualization.heatmap_space_alt import create_and_save_heatmap
+from src.visualization.heatmap import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings
-INPUT_FILE = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Omnibus_Extractions_Select_Columns_W_Duplicates.xlsx"
-HEATMAP_OUTPUT_PREFIX = "Omnibus_Co_occurrence_heatmap_Final4"
+file_name = "Codebook_Omnibus_Global_Technologies.xlsx"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go up one level to the parent directory
+parent_dir = os.path.dirname(script_dir)
+INPUT_FILE = os.path.join(parent_dir, "data", "raw", file_name)
+HEATMAP_OUTPUT_PREFIX = "Omnibus_Co_occurrence_heatmap_retry2"
 CLUSTER_COLUMN = "Sector\Scope "
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -23,7 +28,7 @@ n_entries = 9
 n_enablers = 12
 
 def get_top_features(df, n_enablers, n_entries):
-    rf_results_file = "rf_results_globalFinal.joblib"
+    rf_results_file = "rf_results_globalFinal_retry.joblib"
 
     if os.path.exists(rf_results_file):
         print(f"Loading existing Random Forest results from {rf_results_file}")
@@ -73,7 +78,7 @@ def main():
     heatmap_output = os.path.join(output_dir, f"{HEATMAP_OUTPUT_PREFIX}_global.png")
 
     create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output,
-                            title="Global Co-occurrence Heatmap")
+                            title="Global Co-occurrence Heatmap",threshold=2)
 
     # Print secular enablers
     print("\nSecular Enablers:")

@@ -6,15 +6,20 @@ import joblib
 
 # Add the parent directory to sys.path to allow imports from src
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from src.analysis.Co_occurrence import run_co_occurrence_analysis, calculate_co_occurrence
 from src.data_processing.general_preprocessing import load_and_preprocess
 from src.visualization.heatmap_space_alt import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings
-INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Omnibus_Other_Technologies.xlsx"
-HEATMAP_OUTPUT_PREFIX = "Other_Technologies_Co_occurrence_heatmap_Final9"
+#    file_path = "data\\raw\\Codebook_Omnibus_Other_Technologies.xlsx"
+file_name = "Codebook_Omnibus_Other_Technologies.xlsx"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go up one level to the parent directory
+parent_dir = os.path.dirname(script_dir)
+INPUT_FILE = os.path.join(parent_dir, "data", "raw", file_name)
+HEATMAP_OUTPUT_PREFIX = "Other_Technologies_Co_occurrence_heatmap_Final10"
 CLUSTER_COLUMN = "subsector"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -23,7 +28,7 @@ n_entries = 10
 n_enablers = 10
 
 def get_top_features(df, n_enablers, n_entries):
-    rf_results_file = "rf_results_OtherFinal_Detailed4.joblib"
+    rf_results_file = "rf_results_OtherFinal_Detailed233.joblib"
 
     if os.path.exists(rf_results_file):
         print(f"Loading existing Random Forest results from {rf_results_file}")

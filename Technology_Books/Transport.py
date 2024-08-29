@@ -10,9 +10,14 @@ from src.visualization.heatmap import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings
-INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Transport(1).xlsm"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsTransport_det_"
-HEATMAP_OUTPUT_PREFIX = "Transport_Co_occurrence_heatmap_final_"
+file_name = "Codebook_Transport(1).xlsm"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go up one level to the parent directory
+parent_dir = os.path.dirname(script_dir)
+INPUT_FILE = os.path.join(parent_dir, "data", "raw", file_name)
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsTransport_det_2"
+HEATMAP_OUTPUT_PREFIX = "Transport_Co_occurrence_heatmap_final_4"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -20,7 +25,7 @@ ENTRY_COLUMN = "Entry (policy intervention)"
 def main():
     # Load and Preprocess Data
     df, vectorized_data = load_and_preprocess(INPUT_FILE, ENABLER_COLUMN, ENTRY_COLUMN, CLUSTER_COLUMN)
-    
+
     # Calculate full co-occurrences
     co_occurrence_matrices = calculate_co_occurrence(df, vectorized_data, CLUSTER_COLUMN)
 
@@ -45,11 +50,10 @@ def main():
         10,  # n_enablers
         10,  # n_entries
         RF_RESULTS_FILE_PREFIX,
-        detailed= False,
+        detailed= True,
         cluster_specific= False,
         df=df,
-        feature_selection_method=''
-        
+
     )
     top_enablers = results['top_enablers']
     top_entries = results['top_entries']
@@ -75,8 +79,8 @@ def main():
     heatmap_output = os.path.join(output_dir, f"{HEATMAP_OUTPUT_PREFIX}.png")
 
     # Define the title for the heatmap
-    title = "Transport Entry Points for Unlocks"    
-    create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output, 
+    title = "Transport Entry Points for Unlocks"
+    create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output,
                             color_palette=color_palette, title=title, threshold=1)
 
 if __name__ == "__main__":

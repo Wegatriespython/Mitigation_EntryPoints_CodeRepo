@@ -9,7 +9,11 @@ from imblearn.over_sampling import RandomOverSampler, SMOTE
 from sklearn.ensemble import RandomForestClassifier
 
 # File paths and settings
-INPUT_FILE = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Transport.xlsm"
+file_name = "Codebook_Transport(1).xlsm"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go up one level to the parent directory
+parent_dir = os.path.dirname(script_dir)
 OUTPUT_FILE = "transport_cluster_analysis_results.xlsx"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"

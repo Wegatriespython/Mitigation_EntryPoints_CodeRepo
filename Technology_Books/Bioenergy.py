@@ -10,9 +10,14 @@ from src.visualization.heatmap import create_and_save_heatmap
 from src.analysis.random_forest import run_random_forest_analysis
 
 # File paths and settings
-INPUT_FILE = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Bioenergy.xlsm"
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsBio_det_S"
-HEATMAP_OUTPUT_PREFIX = "Bioenergy_Co_occurrence_heatmap_final_S"
+file_name = "Codebook_Bioenergy.xlsm"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go up one level to the parent directory
+parent_dir = os.path.dirname(script_dir)
+INPUT_FILE = os.path.join(parent_dir, "data", "raw", file_name)
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsBio107"
+HEATMAP_OUTPUT_PREFIX = "Bioenergy_Co_occurrence_heatmap105"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -20,10 +25,10 @@ ENTRY_COLUMN = "Entry (policy intervention)"
 def main():
     # Load and Preprocess Data
     df, vectorized_data = load_and_preprocess(INPUT_FILE, ENABLER_COLUMN, ENTRY_COLUMN, CLUSTER_COLUMN)
-    
+
     # Calculate full co-occurrences
     co_occurrence_matrices = calculate_co_occurrence(df, vectorized_data, CLUSTER_COLUMN)
-    
+
     # Determine clusters
     clusters = df[CLUSTER_COLUMN].unique()
     print(f"Clusters: {clusters}")
@@ -47,7 +52,7 @@ def main():
         detailed= True,
         cluster_specific= False,
         df=df,
-        feature_selection_method=''
+
         )
     top_enablers = results['top_enablers']
     top_entries = results['top_entries']
@@ -73,8 +78,8 @@ def main():
     heatmap_output = os.path.join(output_dir, f"{HEATMAP_OUTPUT_PREFIX}.png")
 
     # Define the title for the heatmap
-    title = "Bioenergy Entry Points for Unlocks"    
-    create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output, 
+    title = "Bioenergy Entry Points for Unlocks"
+    create_and_save_heatmap(co_occurrence_data, clusters, heatmap_output,
                             color_palette=color_palette, title=title, threshold=2)
 
 if __name__ == "__main__":

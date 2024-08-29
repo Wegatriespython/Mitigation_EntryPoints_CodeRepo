@@ -9,7 +9,12 @@ from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import RandomForestClassifier
 
 # File paths and settings
-INPUT_FILE = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\REWindSolar.xlsx"
+file_name = "REWindSolar.xlsx"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go up one level to the parent directory
+parent_dir = os.path.dirname(script_dir)
+INPUT_FILE = os.path.join(parent_dir, "data", "raw", file_name)
 OUTPUT_FILE = "cluster_analysis_results.xlsx"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"

@@ -16,6 +16,8 @@ def clean_labels(labels):
         'e_structural_reform': 'Structural Reform',
         'e_cost_producer': 'Producer Costs',
         'e_cost_consumer': 'Consumer Costs',
+        'i_policy_transparency': 'Policy Transparency',
+        'i_policy_surveillance': 'Policy Surveillance',
         't_other': 'Technology Specific Factors',
         'e_coal_taxes': 'Coal Taxes',
         's_effects_on_health_and_wellbeing': 'Health and Wellbeing Effects',
