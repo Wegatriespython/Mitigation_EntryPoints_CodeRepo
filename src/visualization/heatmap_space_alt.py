@@ -135,7 +135,7 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
     """
     # Filter co_occurrence_data to include only the specified clusters
     co_occurrence_data = co_occurrence_data[clusters]
-    #co_occurrence_data = co_occurrence_data[co_occurrence_data.max(axis=1) >= 2]
+
     fig = plt.figure(figsize=(24, 12))
     gs = fig.add_gridspec(1, 2, width_ratios=[1, 3])
 
