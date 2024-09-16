@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Mermaid Diagram</title>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    </head>
+    <body>
+        <div class="mermaid">
+            graph TD
+            A[Load Data from Excel] --> B[Preprocess Data]
+            B --> C[Create Feature Matrix]
+            C --> D[Train Random Forest]
+            C --> E[Calculate Co-occurrences]
+            D --> F[Feature Importance]
+            F --> G[Select Top Features]
+            E --> H[Subset Co-occurrences]
+   
+            H --> I[Create Bubble Plot]
+        
+            subgraph Data Processing
+            A
+            B
+            C
+            end
+        
+            subgraph Random Forest Analysis
+            D
+            F
+            G
+            end
+        
+            subgraph Co-occurrence Analysis
+            E
+            H
+            end
+        
+            subgraph Visualization
+            I
+            end
+        
+            %% Additional details
+            B -->|"Clean terms, vectorize data"| C
+            C -->|"Enabler & Entry features"| D
+            C -->|"Enabler & Entry matrices"| E
+            D -->|"Feature importance scores"| F
+            F -->|"Top N Enablers & Entries"| G
+            E -->|"Full co-occurrence matrices"| H
+            G -->|"Selected features"| H
+
+        </div>
+
+        <script>
+            mermaid.initialize({ startOnLoad: true });
+        </script>
+    </body>
+</html>

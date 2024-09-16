@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Mermaid Diagram</title>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    </head>
+    <body>
+        <div class="mermaid">
+            graph LR
+            A[Context]
+            B[Enablers]
+            C[Policy Interventions]
+            EP((Entry Point))
+            BA((Barriers))
+            SD{Successful Deployment}
+            
+            A --> B
+            A --> C
+            
+            B --> D[Economic]
+            B --> E[Institutional]
+            B --> F[Social]
+            B --> G[Technological]
+            
+            C --> H[Market Instrument]
+            C --> I[Regulation]
+            C --> J[Communication]
+            C --> K[Planning]
+            C --> L[Fiscal Action]
+            
+            D -.-> EP
+            E -.-> EP
+            F -.-> EP
+            G -.-> EP
+            H -.-> BA
+            I -.-> BA
+            J -.-> BA
+            K -.-> BA
+            L -.-> BA
+            
+            BA --> EP
+            EP --> SD
+        
+            classDef default fill:lilac,stroke:#333,color:black;
+            classDef enablers fill:white,stroke:#333,color:black;
+            classDef policies fill:black,stroke:#333,color:white;
+            classDef entryPoint fill:darkgreen,stroke:#333,color:black;
+            classDef barriers fill:crimson,stroke:#333,color:black;
+            classDef successful fill:gold,stroke:#333,color:black;
+            
+            class B,D,E,F,G enablers;
+            class C,H,I,J,K,L policies;
+            class EP entryPoint;
+            class BA barriers;
+            class SD successful;
+        </div>
+
+        <script>
+            mermaid.initialize({ startOnLoad: true });
+        </script>
+    </body>
+</html>

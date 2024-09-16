@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Mermaid Diagram</title>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    </head>
+    <body>
+        <div class="mermaid">
+            graph TD
+            A[Paper] --> B[Identify Entry Points]
+            B --> C[Extract Data]
+            
+            D[Feasibility Framework] --> E[Dictionary]
+            E --> F[Extract Data]
+            F --> G["[1:P] Dimensional Vector"]
+            
+            H["[N:P] Matrix Raw Data"] --> I[Qualitative Clustering]
+            I --> J["Clusters [K:N],<br> K subset N"]
+            
+            K["Enablers"]
+            L["Policies"]
+            L --> |Features| M ["Random Forest"]
+            K --> |Features| M
+            J --> |Predict| M
+
+
+            M --> N["Cluster Relationship <br> With Entry Points"]
+            
+            %% Styling
+        classDef process fill:#e6f3ff,stroke:#333,stroke-width:2px;
+        classDef data fill:#ffe6e6,stroke:#333,stroke-width:2px;
+        classDef subset fill:#e6ffe6,stroke:#333,stroke-width:2px;
+            
+            class B,C,F,I,M process;
+            class A,D,E,G,H,J,N data;
+            class K,L subset;
+            
+            %% Annotations
+            G -.-> |Subset| K
+            G -.-> |Subset| L
+            C -.-> |Feeds into| H
+            G -.-> |Contributes to| H
+
+            subgraph "N Dimensions"
+                H
+                K
+                L
+            end
+
+        </div>
+
+        <script>
+            mermaid.initialize({ startOnLoad: true });
+        </script>
+    </body>
+</html>
