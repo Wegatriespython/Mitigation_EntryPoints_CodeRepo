@@ -18,9 +18,10 @@ file_name = "REWindSolar.xlsx"
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Go up one level to the parent directory
+# rf_analysis_resultsRE_12
 parent_dir = os.path.dirname(script_dir)
 INPUT_FILE = os.path.join(parent_dir, "data", "raw", file_name)
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_12"
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_14"
 HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_final_V2_222"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
@@ -51,7 +52,7 @@ def main():
     # Batch Analysis
     # rf_analysis_resultsREV2_@
     for batch_idx, batch_clusters in enumerate(cluster_batches):
-        RF_RESULTS_FILE_PREFIX = f"rf_analysis_resultsREV2_@#{batch_idx + 1}_"
+        RF_RESULTS_FILE_PREFIX = f"rf_analysis_resultsREV2{batch_idx + 1}_"
         print(f"\nProcessing Batch {batch_idx + 1}")
         df_batch = df[df[CLUSTER_COLUMN].isin(batch_clusters)].copy()
 
