@@ -2,10 +2,11 @@ import pandas as pd
 from collections import Counter
 
 # File path
-file_path = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Codebook_Omnibus_Extractions_Select_Columns_W_Duplicates.xlsx"
+file_path = r"C:\Users\rahelma\Documents\Elevate\EntryPointCode\Mitigation_EntryPoints_CodeRepo\Data\raw\Codebook_Omnibus_Global_Technologies.xlsx"
 
 # Read the Excel file
 df = pd.read_excel(file_path)
+#df = pd.read_csv(file_path)
 
 # Function to handle multi-country entries and return a list
 def split_countries(entry):

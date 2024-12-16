@@ -118,7 +118,7 @@ def clean_labels(labels):
         'e_share_electricity_coal': 'Coal Share of Electricity',
         'e_share_energy_coal': 'Coal Share of Energy',
         'i_policy_design': 'Policy Design',
-        't_political_target': 'Phase Out Target',
+        't_political_target': 'Technology Target',
         'e_retirement_premium': 'Retirement Premiums',
         'b_removal_of_fossilfuel_subsidies': 'Fossil Fuel Subsidy Removal',
         'r_procurement_rules_general': 'Renewable Portfolio Standards',
@@ -198,11 +198,11 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
 
     heatmap_ax.set_xticks(np.arange(len(cleaned_x_labels))+0.5)
     heatmap_ax.set_yticks(np.arange(len(cleaned_y_labels))+0.5)
-    heatmap_ax.set_xticklabels(cleaned_x_labels, rotation=45, ha="right")
-    heatmap_ax.set_yticklabels(cleaned_y_labels)
+    heatmap_ax.set_xticklabels(cleaned_x_labels, rotation=45, ha="right", fontsize=14)
+    heatmap_ax.set_yticklabels(cleaned_y_labels, fontsize=14)
     heatmap_ax.set_title(title, fontsize=16)
-    heatmap_ax.set_xlabel("Entries", fontsize=12)
-    heatmap_ax.set_ylabel("Enablers", fontsize=12)
+    heatmap_ax.set_xlabel("Policy Intervention", fontsize=16)
+    heatmap_ax.set_ylabel("Enablers", fontsize=16)
  # --- Legend ---
     legend_ax.axis("off")
     legend_ax.text(0.05, 0.95, "Legend", fontsize=16, fontweight="bold")

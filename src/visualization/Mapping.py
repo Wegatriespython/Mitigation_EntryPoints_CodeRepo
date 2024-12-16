@@ -7,7 +7,7 @@ import plotly.io as pio
 
 # Read the Excel file into a DataFrame
 # Load the CSV file
-file_path = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Omnibus_Global_Technologies.xlsx"
+file_path = r"C:\Users\rahelma\Documents\Elevate\EntryPointCode\Mitigation_EntryPoints_CodeRepo\Data\raw\Codebook_Omnibus_Global_Technologies.xlsx"
 df = pd.read_excel(file_path)
 
 
@@ -67,7 +67,7 @@ region_counts_df.columns = ['research_geography', 'count']
 region_counts_df = region_counts_df.sort_values('count', ascending=False)
 
 # Load the world map data from the local file
-world = gpd.read_file(r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\ne_50m_admin_0_countries\ne_50m_admin_0_countries.shp")
+world = gpd.read_file(r"C:\Users\rahelma\Documents\Elevate\EntryPointCode\Mitigation_EntryPoints_CodeRepo\Data\ne_50m_admin_0_countries\ne_50m_admin_0_countries.shp")
 
 # Ensure country names match between your data and the shapefile
 world['NAME'] = world['NAME'].replace({
@@ -81,7 +81,7 @@ world['NAME'] = world['NAME'].replace({
 world['count'] = world['NAME'].map(region_counts).fillna(0)
 
 # Load the states map data from the local file
-states = gpd.read_file(r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\ne_10m_admin_1_states_provinces\ne_10m_admin_1_states_provinces.shp")
+states = gpd.read_file(r"C:\Users\rahelma\Documents\Elevate\EntryPointCode\Mitigation_EntryPoints_CodeRepo\Data\ne_10m_admin_1_states_provinces\ne_10m_admin_1_states_provinces.shp")
 
 # Add count column to states for subnational regions
 states['count'] = states['name'].map(lambda x: region_counts.get(x, 0))
@@ -122,7 +122,7 @@ fig.add_trace(go.Choropleth(
     zmax=world['count'].max(),
     marker_opacity=0.8,
     marker_line_width=0.5,
-    colorbar_title="Research Frequency",
+    colorbar_title="Research frequency",
 ))
 
 # Add subnational regions overlay
@@ -139,7 +139,7 @@ fig.add_trace(go.Choropleth(
 ))
 
 fig.update_layout(
-    title_text='Frequency of Research by Region',
+    title_text='Frequency of research by region',
     geo=dict(
         showframe=False,
         showcoastlines=True,

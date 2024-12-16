@@ -6,7 +6,7 @@ from matplotlib.path import Path
 import matplotlib.colors as mcolors
 
 # Read the CSV file
-file_path = r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Timeline Policies.csv"
+file_path = r"C:\Users\rahelma\Documents\Elevate\EntryPointCode\Mitigation_EntryPoints_CodeRepo\Data\raw\Timeline Policies.csv"
 df = pd.read_csv(file_path)
 
 # Sort the dataframe by year

@@ -18,12 +18,12 @@ def clean_label(text: str) -> str:
         str: The cleaned and formatted text.
     """
     replacements = {
-        "electric_vehicles_(BEV)": "Electric Vehicles",
-        "fuel_cell_cars_(FCEV)": "Fuel Cell Cars",
+        "electric_vehicles_(BEV)": "Electric vehicles",
+        "fuel_cell_cars_(FCEV)": "Fuel cell",
         "Behind-the-meter (BTM) energy storage": "Behind-the-meter Energy Storage",
         "Behind-the-meter energy storage": "Behind-the-meter Energy Storage",
-        "Rewind-solar" : "RE(Wind and Solar)",
-        "carbon_management": "Carbon Mgmt",
+        "Rewind-solar" : "RE",
+        "carbon_management": "Carbon mgmt",
     }
 
     for old, new in replacements.items():
@@ -83,7 +83,7 @@ def prepare_sunburst_data(counted_data: Dict[str, Dict[str, int]]) -> List[Dict[
             if option.lower() == "ccs":
                 option = "CCS"
             elif option.lower() in ["rewind-solar", "RE(Wind-Solar)"]:
-                option = "RE(Wind and Solar)"
+                option = "RE"
 
             sunburst_data.append({
                 'sector': sector_label,
@@ -114,15 +114,15 @@ def create_sunburst_chart(nested_freq_table: pd.DataFrame) -> px.sunburst:
     fig.update_layout(
         margin=dict(t=80, l=0, r=0, b=0),
         title=dict(
-            text='Technology Sectors and Mitigation Options',
+            text='Sectoral and technological coverage',
             font=dict(size=24, family="Arial Black, sans-serif"),
             x=0.5,
             y=0.95
         ),
         coloraxis_colorbar=dict(
-            title="Count",
+            title="Frequency",
             tickvals=[nested_freq_table['count'].min(), nested_freq_table['count'].mean(), nested_freq_table['count'].max()],
-            ticktext=["Low", "Medium", "High"]
+            ticktext=["low", "medium", "high"]
         )
     )
 
@@ -139,7 +139,7 @@ def create_sunburst_chart(nested_freq_table: pd.DataFrame) -> px.sunburst:
 def main():
     try:
         # Load the CSV file
-        file_path = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Omnibus_Global_Technologies.xlsx"
+        file_path = r"C:\Users\rahelma\Documents\Elevate\EntryPointCode\Mitigation_EntryPoints_CodeRepo\Data\raw\Codebook_Omnibus_Global_Technologies.xlsx"
         data = pd.read_excel(file_path)
         logging.info(f"Successfully loaded data from {file_path}")
 

@@ -35,8 +35,8 @@ def main():
 
     # Hardcoded cluster batches
     cluster_batches = [
-        ["Market_Based", "Distributed_Industrial_Policy ", "Regional_Autonomy"],
-        ["Centralized_Industrial_Policy", "Financial Cross-Cutters", "Adaptive_Pragmatists"]
+        ["Instrumentalists", "Strategists", "Regional autonomy"],
+        ["Planners", "Financial cross-cutters", "Adaptive pragmatists"],
     ]
 
     # Print cluster batches
@@ -56,7 +56,7 @@ def main():
         df_batch = df[df[CLUSTER_COLUMN].isin(batch_clusters)].copy()
 
         if batch_idx == 0:
-            n_enablers = 9
+            n_enablers = 12
             n_entries = 12
             detailed2 = True
             specific = False
@@ -101,7 +101,7 @@ def main():
         heatmap_output = os.path.join(output_dir, f"{HEATMAP_OUTPUT_PREFIX}batch_{batch_idx + 1}.png")
 
         # Use different color palette for each batch
-        title = f"Wind & Solar Entry Points for Unlocks Part {batch_idx + 1}"
+        title = f"Solar & Wind Entry Points for Unlocks Part {batch_idx + 1}"
         color_palette = color_palette1 if batch_idx == 0 else color_palette2
 
         print(f"Creating heatmap for Batch {batch_idx + 1}")

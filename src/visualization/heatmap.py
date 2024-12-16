@@ -160,8 +160,8 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
 
                 # Only plot if at least one value is >= threshold
                 if any(v >= threshold for v in values):
-                    if sum(v >= threshold for v in values) >= 3:
-                        heatmap_ax.add_patch(plt.Rectangle((j, i), 1, 1, fill=True, facecolor="lightgray", edgecolor="none"))
+                  #  if sum(v >= threshold for v in values) >= 3:
+                     #   heatmap_ax.add_patch(plt.Rectangle((j, i), 1, 1, fill=True, facecolor="lightgray", edgecolor="none"))
 
                     for k, value in enumerate(values):
                         if value >= threshold:
@@ -183,37 +183,37 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
     cleaned_x_labels = clean_labels(entries)
     cleaned_y_labels = clean_labels(enablers)
     # Add faint dotted gridlines
-    heatmap_ax.grid(which='both', color='grey', linestyle=':', linewidth=0.5, alpha=0.5)
+    #heatmap_ax.grid(which='both', color='grey', linestyle=':', linewidth=0.5, alpha=0.5)
 
     # Ensure gridlines are behind the data
     heatmap_ax.set_axisbelow(True)
 
     heatmap_ax.set_xticks(np.arange(len(cleaned_x_labels))+0.5)
     heatmap_ax.set_yticks(np.arange(len(cleaned_y_labels))+0.5)
-    heatmap_ax.set_xticklabels(cleaned_x_labels, rotation=45, ha="right")
-    heatmap_ax.set_yticklabels(cleaned_y_labels)
+    heatmap_ax.set_xticklabels(cleaned_x_labels, rotation=45, ha="right", fontsize=14)
+    heatmap_ax.set_yticklabels(cleaned_y_labels, fontsize=14)
     heatmap_ax.set_title(title, fontsize=16)
-    heatmap_ax.set_xlabel("Entries", fontsize=12)
-    heatmap_ax.set_ylabel("Enablers", fontsize=12)
+    heatmap_ax.set_xlabel("Policy Intervention", fontsize=16)
+    heatmap_ax.set_ylabel("Enablers", fontsize=16)
  # --- Legend ---
     legend_ax.axis("off")
     legend_ax.text(0.05, 0.95, "Legend", fontsize=16, fontweight="bold")
     legend_ax.text(
-        0.05, 0.85, "Circle size increases with co-occurrence count", fontsize=10
+        0.05, 0.85, "Circle size increases with co-occurrence count", fontsize=14
     )
     arrow = FancyArrowPatch(
         (0.1, 0.75), (0.9, 0.75), arrowstyle="->", mutation_scale=20
     )
     legend_ax.add_patch(arrow)
-    legend_ax.text(0.1, 0.7, "Low", ha="left", va="top", fontsize=12)
-    legend_ax.text(0.9, 0.7, "High", ha="right", va="top", fontsize=12)
+    legend_ax.text(0.1, 0.7, "Low", ha="left", va="top", fontsize=14)
+    legend_ax.text(0.9, 0.7, "High", ha="right", va="top", fontsize=14)
 
     sizes = [100, 400, 1000]
     positions = [0.2, 0.5, 0.8]
     for size, pos in zip(sizes, positions):
         legend_ax.scatter(pos, 0.75, s=size, c="gray", edgecolor="black")
 
-    legend_ax.text(0.05, 0.6, f"Only co-occurrences ≥ {threshold} are plotted", fontsize=12, fontweight='bold')
+    legend_ax.text(0.05, 0.6, f"Only co-occurrences ≥ {threshold} are plotted", fontsize=14, fontweight='bold')
     # Adjust the y-position of the following legend elements
     #
     # Add explanation for grey patch

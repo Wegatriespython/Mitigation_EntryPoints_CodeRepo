@@ -5,7 +5,7 @@ import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
 # Load the states map data from the local file
-states = gpd.read_file(r"C:\Users\vigneshr\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\ne_10m_admin_1_states_provinces\ne_10m_admin_1_states_provinces.shp")
+states = gpd.read_file(r"C:\Users\rahelma\Documents\Elevate\EntryPointCode\Mitigation_EntryPoints_CodeRepo\Data\ne_10m_admin_1_states_provinces\ne_10m_admin_1_states_provinces.shp")
 
 # List of countries we're interested in
 countries = ['Canada', 'Brazil', 'Japan', 'Italy', 'United Kingdom', 'China']

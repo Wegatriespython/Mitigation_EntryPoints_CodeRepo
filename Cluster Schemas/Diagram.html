@@ -10,15 +10,15 @@
     <div class="mermaid">
         %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffffff', 'textColor': '#000000', 'lineColor': '#000000' }}}%%
         graph TD
-            A[Cluster Classification]
-            B[Economic Status]
+            A[Qualitative clustering]
+            B[Economic status]
             C[Motivation]
             D[Governance]
 
             A --> B & C & D
             B --> B1[Advanced] & B2[Intermediate] & B3[Emerging] 
             C --> C1[Green] & C2[Co-Benefits] & C4[Strategic]
-            D --> D1[Centralized] & D2[Federal] & D3[Devolved]
+            D --> D1[Centralized] & D2[Federal] & D3[Decentralized]
 
         
             classDef default fill:#ffffff,stroke:#000000,stroke-width:1px;
