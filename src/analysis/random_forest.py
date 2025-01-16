@@ -284,14 +284,37 @@ def aggregate_cluster_results(cluster_importances: Dict[str, pd.DataFrame],
 def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column: str,
                                cluster_column: str, n_enablers: int, n_entries: int,
                                output_file: str, detailed: bool = False, df: pd.DataFrame = None,
-                               cluster_specific: bool = False
+                               cluster_specific: bool = False,
+                               frequency_threshold: float = 0.5,
+                               importance_threshold: float = 0.5,
+                               batch_number: int = None
                                ) -> Dict:
+    # Ensure output_file has a full path
+    if not os.path.isabs(output_file):
+        # Use the script's directory if no absolute path is provided
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        output_dir = os.path.join(script_dir, '..', '..', 'output')
+        os.makedirs(output_dir, exist_ok=True)
+        output_file = os.path.join(output_dir, output_file)
+
+    # Generate a unique filename based on parameters
+    base_filename = os.path.splitext(output_file)[0]
+    
+    # Include batch number in the filename if provided
+    batch_suffix = f"_batch{batch_number}" if batch_number is not None else ""
+    
+    unique_filename = f"{base_filename}{batch_suffix}_n{n_enablers}_m{n_entries}_f{frequency_threshold}_i{importance_threshold}_{'detailed' if detailed else 'standard'}_{'cluster' if cluster_specific else 'global'}.joblib"
+    
+    # Ensure the directory for the unique filename exists
+    unique_dir = os.path.dirname(unique_filename)
+    if unique_dir:
+        os.makedirs(unique_dir, exist_ok=True)
 
     # Check if output file exists and load results
-    if os.path.exists(output_file):
-        print(f"Loading results from {output_file}")
+    if os.path.exists(unique_filename):
+        print(f"Loading results from {unique_filename}")
         try:
-            results = joblib.load(output_file)
+            results = joblib.load(unique_filename)
             print("Results loaded successfully.")
             return results
         except Exception as e:
@@ -323,15 +346,25 @@ def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column
         print("Running regular random forest")
         random_search = train_random_forest(feature_matrix, y, detailed)
         importances = random_search.best_estimator_.feature_importances_
+        
+        # Add boosting for essential features with configurable thresholds
+        boosted_importances = boost_essential_features(
+            feature_matrix,
+            y,
+            importances,
+            frequency_threshold=frequency_threshold,
+            importance_threshold=importance_threshold
+        )
+        
         feature_imp = pd.DataFrame({
             'feature': feature_names,
-            'importance': importances,
-            'type': ['Enabler' if i < len(enabler_features) else 'Entry' for i in range(len(feature_names))]
+            'importance': boosted_importances,
+            'type': ['Enabler' if i < len(enabler_features) else 'Entry' 
+                     for i in range(len(feature_names))]
         })
         feature_imp = feature_imp.sort_values(by='importance', ascending=False)
 
         print("Selecting top features")
-
 
         top_enablers = get_top_features(feature_imp, 'Enabler', n_enablers)
         top_entries = get_top_features(feature_imp, 'Entry', n_entries)
@@ -343,7 +376,9 @@ def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column
         }
 
     print("Saving results")
-    joblib.dump(results, output_file)
+    # Ensure output directory exists
+    os.makedirs(os.path.dirname(unique_filename), exist_ok=True)
+    joblib.dump(results, unique_filename)
 
     print("Results structure:")
     for key, value in results.items():
@@ -360,6 +395,67 @@ def run_random_forest_analysis(file_path: str, enabler_column: str, entry_column
     print("Finished run_random_forest_analysis")
     return results
 
+def boost_essential_features(feature_matrix: np.ndarray, 
+                           y: np.ndarray, 
+                           rf_importances: np.ndarray,
+                           frequency_threshold: float = 0.7,
+                           importance_threshold: float = 0.25) -> np.ndarray:
+    """
+    Boosts features that are frequent in clusters but have low RF importance.
+    """
+    adjusted_importances = rf_importances.copy()
+    
+    # Store original importances for comparison
+    original_normalized = rf_importances / np.max(rf_importances)
+    
+    # Normalize RF importances to [0,1]
+    normalized_rf_imp = original_normalized.copy()
+    
+    total_boosted_features = 0
+    for cluster in np.unique(y):
+        cluster_mask = (y == cluster)
+        cluster_data = feature_matrix[cluster_mask]
+        
+        # Calculate frequency of each feature in this cluster
+        feature_frequencies = np.mean(cluster_data, axis=0)
+        
+        # Identify features that are frequent but undervalued
+        essential_mask = (feature_frequencies >= frequency_threshold) & \
+                        (normalized_rf_imp <= importance_threshold)
+        
+        if np.any(essential_mask):
+            total_boosted_features += np.sum(essential_mask)
+            print(f"\nCluster {cluster} boosting stats:")
+            print(f"Found {np.sum(essential_mask)} features to boost")
+            print(f"Average frequency of boosted features: {feature_frequencies[essential_mask].mean():.3f}")
+            print(f"Average original importance of boosted features: {normalized_rf_imp[essential_mask].mean():.3f}")
+            
+            # Boost factor based on how essential the feature is
+            boost_factors = feature_frequencies[essential_mask] / \
+                          normalized_rf_imp[essential_mask]
+            
+            # Apply boost to these features
+            adjusted_importances[essential_mask] *= boost_factors
+    
+    # Re-normalize to maintain relative scale
+    final_importances = adjusted_importances / np.max(adjusted_importances)
+    
+    # Verify boosting had an effect
+    if total_boosted_features > 0:
+        diff = np.abs(final_importances - original_normalized)
+        max_diff = np.max(diff)
+        avg_diff = np.mean(diff)
+        print("\nBoosting verification:")
+        print(f"Total features boosted: {total_boosted_features}")
+        print(f"Maximum importance change: {max_diff:.3f}")
+        print(f"Average importance change: {avg_diff:.3f}")
+        
+        # Assert that boosting made some difference
+        assert max_diff > 1e-6, "Boosting did not affect feature importances"
+    else:
+        print("\nNo features met the boosting criteria")
+    
+    return final_importances
 
 if __name__ == "__main__":
     # Example usage
