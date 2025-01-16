@@ -18,11 +18,10 @@ file_name = "REWindSolar.xlsx"
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Go up one level to the parent directory
-# rf_analysis_resultsRE_12
 parent_dir = os.path.dirname(script_dir)
-INPUT_FILE = os.path.join(parent_dir, "data", "raw", file_name)
-RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_14"
-HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_final_V2_222"
+INPUT_FILE = os.path.join(file_name)
+RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_132"
+HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_final_V2_2323"
 CLUSTER_COLUMN = "Cluster"
 ENABLER_COLUMN = "Enabler"
 ENTRY_COLUMN = "Entry (policy intervention)"
@@ -36,8 +35,8 @@ def main():
 
     # Hardcoded cluster batches
     cluster_batches = [
-        ["Market_Based", "Distributed_Industrial_Policy ", "Regional_Autonomy"],
-        ["Centralized_Industrial_Policy", "Financial Cross-Cutters", "Adaptive_Pragmatists"]
+        ["Instrumentalists", "Strategists", "Regional autonomy"],
+        ["Planners", "Financial cross-cutters", "Adaptive pragmatists"],
     ]
 
     # Print cluster batches
@@ -45,19 +44,30 @@ def main():
     for i, batch in enumerate(cluster_batches):
         print(f"Batch {i+1}: {', '.join(batch)}")
 
-    # Define two distinct color palettes
-    color_palette1 = plt.cm.Set1(np.linspace(0, 1, 9))
-    color_palette2 = plt.cm.Set2(np.linspace(0, 1, 8))
+    # Define colorblind-friendly palettes with distinct, well-spaced colors
+    # Palette 1: Based on Wong's colorblind-safe palette
+    color_palette1 = np.array([
+        [230, 159, 0],    # Orange
+        [86, 180, 233],   # Sky Blue
+        [0, 158, 115],    # Bluish Green
+    ]) / 255.0
+
+    # Palette 2: Complementary distinct colors
+    color_palette2 = np.array([
+        [213, 94, 0],     # Vermillion
+        [204, 121, 167],  # Reddish Purple
+        [0, 114, 178],    # Blue
+    ]) / 255.0
 
     # Batch Analysis
     # rf_analysis_resultsREV2_@
     for batch_idx, batch_clusters in enumerate(cluster_batches):
-        RF_RESULTS_FILE_PREFIX = f"rf_analysis_resultsREV2{batch_idx + 1}_"
+        RF_RESULTS_FILE_PREFIX = f"rf_analysis_resultsREV2_@#{batch_idx + 1}_"
         print(f"\nProcessing Batch {batch_idx + 1}")
         df_batch = df[df[CLUSTER_COLUMN].isin(batch_clusters)].copy()
 
         if batch_idx == 0:
-            n_enablers = 9
+            n_enablers = 12
             n_entries = 12
             detailed2 = True
             specific = False
@@ -102,7 +112,7 @@ def main():
         heatmap_output = os.path.join(output_dir, f"{HEATMAP_OUTPUT_PREFIX}batch_{batch_idx + 1}.png")
 
         # Use different color palette for each batch
-        title = f"Wind & Solar Entry Points for Unlocks Part {batch_idx + 1}"
+        title = f"Solar & Wind Entry Points for Unlocks Part {batch_idx + 1}"
         color_palette = color_palette1 if batch_idx == 0 else color_palette2
 
         print(f"Creating heatmap for Batch {batch_idx + 1}")
