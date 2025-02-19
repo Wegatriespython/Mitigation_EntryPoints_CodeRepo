@@ -3,6 +3,7 @@ import plotly.express as px
 from collections import defaultdict
 import logging
 from typing import Dict, List
+import numpy as np
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -18,18 +19,21 @@ def clean_label(text: str) -> str:
         str: The cleaned and formatted text.
     """
     replacements = {
-        "electric_vehicles_(BEV)": "Electric Vehicles",
-        "fuel_cell_cars_(FCEV)": "Fuel Cell Cars",
+        "electric_vehicles_(BEV)": "Electric vehicles",
+        "fuel_cell_cars_(FCEV)": "Fuel cell",
         "Behind-the-meter (BTM) energy storage": "Behind-the-meter Energy Storage",
         "Behind-the-meter energy storage": "Behind-the-meter Energy Storage",
-        "Rewind-solar" : "RE(Wind and Solar)",
-        "carbon_management": "Carbon Mgmt",
+        "Rewind-solar" : "RE",
+        "carbon_management": "C.Mgt",
     }
 
     for old, new in replacements.items():
         text = text.replace(old, new)
 
+
     text = text.replace('_', ' ').replace('(', '').replace(')', '')
+    if text.lower() == "c.mgt":
+        return "C.Mgt"
     return ' '.join(word.capitalize() for word in text.split())
 
 def manual_count(df: pd.DataFrame) -> Dict[str, Dict[str, int]]:
@@ -79,11 +83,13 @@ def prepare_sunburst_data(counted_data: Dict[str, Dict[str, int]]) -> List[Dict[
 
 
         for option, count in options.items():
-            # Correct capitalization for CCS
+            # Standardize labels
             if option.lower() == "ccs":
                 option = "CCS"
+            elif option == "C.Mgmt":
+                option = "C.Mgt"
             elif option.lower() in ["rewind-solar", "RE(Wind-Solar)"]:
-                option = "RE(Wind and Solar)"
+                option = "RE"
 
             sunburst_data.append({
                 'sector': sector_label,
@@ -94,14 +100,9 @@ def prepare_sunburst_data(counted_data: Dict[str, Dict[str, int]]) -> List[Dict[
 
 def create_sunburst_chart(nested_freq_table: pd.DataFrame) -> px.sunburst:
     """
-    Create a sunburst chart from the nested frequency table.
-
-    Args:
-        nested_freq_table (pd.DataFrame): The nested frequency table.
-
-    Returns:
-        px.sunburst: The created sunburst chart.
+    Create a sunburst chart with automatically positioned external annotations for small segments.
     """
+    # Create the base sunburst chart
     fig = px.sunburst(
         nested_freq_table,
         path=['sector', 'mitigation_option'],
@@ -111,27 +112,37 @@ def create_sunburst_chart(nested_freq_table: pd.DataFrame) -> px.sunburst:
         color_continuous_midpoint=nested_freq_table['count'].mean()
     )
 
+    # Base layout updates
     fig.update_layout(
-        margin=dict(t=80, l=0, r=0, b=0),
+        width=1200,
+        height=800,
+        margin=dict(t=80, l=50, r=150, b=100),  # Changed right margin from 250 to 50 for better centering
         title=dict(
-            text='Technology Sectors and Mitigation Options',
-            font=dict(size=24, family="Arial Black, sans-serif"),
-            x=0.5,
+            text='Sectoral and technological coverage',
+            font=dict(size=28, family="Arial Black, sans-serif"),
+            x=0.5,  # This already centers the title horizontally
             y=0.95
         ),
         coloraxis_colorbar=dict(
-            title="Count",
+            title="Frequency",
             tickvals=[nested_freq_table['count'].min(), nested_freq_table['count'].mean(), nested_freq_table['count'].max()],
-            ticktext=["Low", "Medium", "High"]
-        )
+            ticktext=["low", "medium", "high"],
+            orientation='h',
+            yanchor='bottom',
+            y=-0.2,
+            xanchor='center',
+            x=0.5,
+            len=0.6
+        ),
+        showlegend=False,
     )
 
+    # Update trace properties
     fig.update_traces(
-        textfont=dict(size=14, family="Arial Black, sans-serif"),
+        textfont=dict(size=16, family="Arial Black, sans-serif"),
         insidetextorientation='radial',
         hovertemplate='<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percentParent:.1%}',
-        marker=dict(line=dict(color='white', width=2)),
-        domain=dict(x=[0.1, 0.9], y=[0.1, 0.9])
+        marker=dict(line=dict(color='white', width=2))
     )
 
     return fig
@@ -139,7 +150,7 @@ def create_sunburst_chart(nested_freq_table: pd.DataFrame) -> px.sunburst:
 def main():
     try:
         # Load the CSV file
-        file_path = r"C:\Users\vigne\OneDrive - Wageningen University & Research\Internship\Literature Review\Final Data Processing\Mitigation_EntryPoints_CodeRepo\data\raw\Codebook_Omnibus_Global_Technologies.xlsx"
+        file_path = r"V:\Paper_rahel\Files\Codebook_Omnibus_Global_Technologies.xlsx"
         data = pd.read_excel(file_path)
         logging.info(f"Successfully loaded data from {file_path}")
 
