@@ -4,6 +4,8 @@ from matplotlib.patches import FancyArrowPatch
 import numpy as np
 import pandas as pd
 from typing import List, Tuple
+import os
+import textwrap
 
 
 def clean_labels(labels):
@@ -123,18 +125,24 @@ def clean_labels(labels):
     }
     return [cleanup_dict.get(label, label) for label in labels]
 
-def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_palette=None,  title: str = None, threshold: int = 1) -> Tuple[plt.Figure, plt.Axes]:
-    """
-    Create a custom heatmap from co-occurrence data.
-    """
-    # Filter co_occurrence_data to include only the specified clusters
-    co_occurrence_data = co_occurrence_data[clusters]
-    co_occurrence_data = co_occurrence_data[co_occurrence_data.max(axis=1) >= threshold]
-    fig = plt.figure(figsize=(24, 12))
-    gs = fig.add_gridspec(1, 2, width_ratios=[1, 3])
 
-    legend_ax = fig.add_subplot(gs[0])
-    heatmap_ax = fig.add_subplot(gs[1])
+
+def create_and_save_heatmap(co_occurrence_data, clusters, output_path, color_palette=None, title=None, threshold=1):
+    # Create output directory if it doesn't exist
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    
+    # Create and save dummy grid visualization
+    dummy_fig, dummy_ax = create_dummy_grid(co_occurrence_data, title="Raw Co-occurrence Counts")
+    dummy_output = output_path.replace(".png", "_dummy_grid.png")
+    dummy_fig.savefig(dummy_output, bbox_inches='tight', dpi=300)
+    plt.close(dummy_fig)
+    
+    # Adjust figure proportions and spacing
+    fig = plt.figure(figsize=(24, 18))
+    gs = fig.add_gridspec(2, 1, height_ratios=[6, 0.8], hspace=0.6)  # Increased hspace for x-axis label
+    
+    heatmap_ax = fig.add_subplot(gs[0])
+    legend_ax = fig.add_subplot(gs[1])
 
     n_clusters = len(clusters)
 
@@ -148,6 +156,13 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
 
     max_co_occurrence = co_occurrence_data.max().max()
 
+    # Modified filtering logic
+    total_co_occurrence = co_occurrence_data.sum(axis=1)
+    co_occurrence_data = co_occurrence_data[total_co_occurrence >= threshold]
+    mask = (co_occurrence_data >= threshold).any(axis=1)
+    co_occurrence_data = co_occurrence_data[mask]
+    
+    # Get updated enablers/entries after filtering
     enablers = co_occurrence_data.index.get_level_values(0).unique()
     entries = co_occurrence_data.index.get_level_values(1).unique()
 
@@ -160,9 +175,6 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
 
                 # Only plot if at least one value is >= threshold
                 if any(v >= threshold for v in values):
-                    if sum(v >= threshold for v in values) >= 3:
-                        heatmap_ax.add_patch(plt.Rectangle((j, i), 1, 1, fill=True, facecolor="lightgray", edgecolor="none"))
-
                     for k, value in enumerate(values):
                         if value >= threshold:
                             # Normalize the value relative to the cluster's highest co-occurrence
@@ -190,53 +202,110 @@ def create_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str], color_
 
     heatmap_ax.set_xticks(np.arange(len(cleaned_x_labels))+0.5)
     heatmap_ax.set_yticks(np.arange(len(cleaned_y_labels))+0.5)
-    heatmap_ax.set_xticklabels(cleaned_x_labels, rotation=45, ha="right")
-    heatmap_ax.set_yticklabels(cleaned_y_labels)
-    heatmap_ax.set_title(title, fontsize=16)
-    heatmap_ax.set_xlabel("Entries", fontsize=12)
-    heatmap_ax.set_ylabel("Enablers", fontsize=12)
- # --- Legend ---
-    legend_ax.axis("off")
-    legend_ax.text(0.05, 0.95, "Legend", fontsize=16, fontweight="bold")
-    legend_ax.text(
-        0.05, 0.85, "Circle size increases with co-occurrence count", fontsize=10
+    heatmap_ax.set_xticklabels(cleaned_x_labels, rotation=45, ha="right", fontsize=18)
+    heatmap_ax.set_yticklabels(cleaned_y_labels, fontsize=18)
+    heatmap_ax.set_title(title, fontsize=20, fontweight='bold')
+    heatmap_ax.set_xlabel("Policy Intervention", fontsize=20)
+    heatmap_ax.set_ylabel("Enablers", fontsize=20)
+
+    # Configure legend axis
+    legend_ax.set_xticks([])
+    legend_ax.set_yticks([])
+    legend_ax.grid(False)
+    legend_ax.set_frame_on(False)
+
+    # Add grey background matching main plot width
+    legend_bg = plt.Rectangle(
+        (heatmap_ax.get_xlim()[0], 0.2),  # Start at main plot's left edge
+        heatmap_ax.get_xlim()[1] - heatmap_ax.get_xlim()[0],  # Match main plot width
+        0.6,  # Height
+        transform=legend_ax.get_xaxis_transform(),  # Use blended transform
+        color='#f0f0f0',
+        zorder=1
     )
-    arrow = FancyArrowPatch(
-        (0.1, 0.75), (0.9, 0.75), arrowstyle="->", mutation_scale=20
-    )
-    legend_ax.add_patch(arrow)
-    legend_ax.text(0.1, 0.7, "Low", ha="left", va="top", fontsize=12)
-    legend_ax.text(0.9, 0.7, "High", ha="right", va="top", fontsize=12)
+    legend_ax.add_patch(legend_bg)
 
-    sizes = [100, 400, 1000]
-    positions = [0.2, 0.5, 0.8]
-    for size, pos in zip(sizes, positions):
-        legend_ax.scatter(pos, 0.75, s=size, c="gray", edgecolor="black")
-
-    legend_ax.text(0.05, 0.6, f"Only co-occurrences ≥ {threshold} are plotted", fontsize=12, fontweight='bold')
-    # Adjust the y-position of the following legend elements
-    #
-    # Add explanation for grey patch
-    legend_ax.text(0.05, 0.5, "Color: Cluster", fontsize=14)
-
+    # Calculate positions relative to main plot's x-axis
+    x_start = heatmap_ax.get_xlim()[0]
+    total_width = heatmap_ax.get_xlim()[1] - x_start
+    spacing = total_width / len(clusters)
+    
     for i, (cluster, color) in enumerate(zip(clusters, base_colors)):
-        legend_ax.scatter(0.2, 0.45 - i * 0.1, s=600, c=[color], edgecolor="black")
-        legend_ax.text(0.3, 0.45 - i * 0.1, cluster, fontsize=12, va="center")
+        x_pos = x_start + (i * spacing) + (spacing * 0.3)
+        
+        # Draw marker shifted left by diameter
+        legend_ax.scatter(
+            x_pos - 0.15,  # Shift left by circle diameter
+            0.5, 
+            s=600, 
+            c=[color], 
+            edgecolor="black", 
+            zorder=2,
+            transform=legend_ax.get_xaxis_transform()
+        )
+        
+        # Text position remains the same
+        wrapped_text = '\n'.join(textwrap.wrap(cluster, width=20))
+        legend_ax.text(
+            x_pos + 0.02, 
+            0.5, 
+            wrapped_text, 
+            fontsize=16,
+            va='center', 
+            ha='left', 
+            zorder=2,
+            transform=legend_ax.get_xaxis_transform()
+        )
 
-    legend_ax.set_xlim(0, 1)
+    # Set matching x-limits with main plot
+    legend_ax.set_xlim(heatmap_ax.get_xlim())
     legend_ax.set_ylim(0, 1)
 
     plt.tight_layout()
-    return fig, heatmap_ax, legend_ax
-
-def create_and_save_heatmap(co_occurrence_data: pd.DataFrame, clusters: List[str],
-                            output_file: str, color_palette=None, title: str = None, threshold = 1) -> None:
-    """
-    Create, customize, and save the heatmap.
-    """
-    fig, heatmap_ax, legend_ax = create_heatmap(co_occurrence_data, clusters, color_palette, title= title, threshold=threshold)
-
-
-    plt.savefig(output_file, dpi=300, bbox_inches="tight")
+    fig.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
-    print(f"Heatmap saved as {output_file}")
+    print(f"Heatmap saved as {output_path}")
+
+def create_dummy_grid(co_occurrence_data: pd.DataFrame, title: str = None) -> Tuple[plt.Figure, plt.Axes]:
+    """
+    Create a grid visualization showing raw co-occurrence counts.
+    """
+    fig = plt.figure(figsize=(24, 12))
+    ax = fig.add_subplot(111)
+
+    # Get raw counts before any filtering
+    enablers = co_occurrence_data.index.get_level_values(0).unique()
+    entries = co_occurrence_data.index.get_level_values(1).unique()
+    
+    # Create empty matrix filled with zeros
+    matrix = pd.DataFrame(0, index=enablers, columns=entries)
+    
+    # Fill matrix with actual co-occurrence counts
+    for (enabler, entry), row in co_occurrence_data.iterrows():
+        matrix.loc[enabler, entry] = row.sum()
+
+    # Plot background colors based on co-occurrence values
+    ax.imshow(matrix, cmap='RdBu', aspect='auto', 
+              vmin=0, vmax=matrix.max().max())
+
+    # Add text annotations
+    for i, enabler in enumerate(enablers):
+        for j, entry in enumerate(entries):
+            value = matrix.loc[enabler, entry]
+            ax.text(j, i, int(value), ha="center", va="center", 
+                   color="white" if value > matrix.values.max()/2 else "black",
+                   fontsize=14)
+    # Clean and set labels
+    cleaned_x_labels = clean_labels(entries)
+    cleaned_y_labels = clean_labels(enablers)
+    
+    ax.set_xticks(np.arange(len(cleaned_x_labels)))
+    ax.set_yticks(np.arange(len(cleaned_y_labels)))
+    ax.set_xticklabels(cleaned_x_labels, rotation=45, ha="right", fontsize=16)
+    ax.set_yticklabels(cleaned_y_labels, fontsize=16)
+    ax.set_title(title, fontsize=18)
+    ax.set_xlabel("Policy Intervention", fontsize=18)
+    ax.set_ylabel("Enablers", fontsize=18)
+    
+    plt.tight_layout()
+    return fig, ax
