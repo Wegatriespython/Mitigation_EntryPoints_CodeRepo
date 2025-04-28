@@ -121,6 +121,19 @@ def clean_labels(labels):
         'e_green_certificates': 'Green Certificates',
         'e_infrastructure_investments': 'Infrastructure Investments',
         'com_narrative': 'Communication Narrative',
+        't_simplicity': 'Technological Simplicity',
+        'e_oil_prices': 'Oil Prices',
+        'e_consumption_subsidy': 'Consumption Subsidies',
+        'e_land_supply': 'Land Supply',
+        't_formal_ghg_reduction_target': 'Formal GHG Reduction Target',
+        'p_technology_transfer': 'Technology Transfer',
+        'e_gdp': 'GDP',
+        't_maturity_oil_industry_expertise': 'Oil Industry Expertise',
+        'i_political_acceptance': 'Political Acceptance',
+        'i_policy_narrative': 'Communication Narrative',
+        'e_ghg_emission_reduction_crediting_and_offsetting_mechanism': 'GHG Credits and Offset Mechanisms',
+        'e_pilot_project': 'Pilot Project',
+        'e_energy_and_other_taxes': 'Energy and Other Taxes',
         'i_advice_and_aid_in_implementation': 'Implementation Support'
     }
     return [cleanup_dict.get(label, label) for label in labels]

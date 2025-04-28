@@ -322,12 +322,12 @@ def generate_faceted_barchart(counts_df, top_n=10):
         # Add light grid lines
         ax.grid(axis='x', linestyle='--', alpha=0.3)
     
-    plt.suptitle('Top Enablers by Dimension', fontsize=15, fontweight ='bold', y=1.02)
+    plt.suptitle('Enablers Frequency by feasibility dimension', fontsize=15, fontweight ='bold', y=1.02)
     
     # Modify footer position and add padding
     plt.subplots_adjust(bottom=0.15)  # Increase bottom margin
     fig.text(0.5, 0.04,  # Move footer up slightly
-            "*Geographic Dimension omitted (single enabler: Resource Availability, 20 occurrences)",
+            "*Geophysical (resource availability, 20 occurrences) and ecological (environmental impact, 8 occurrences) dimensions omitted ",
             ha='center', fontsize=12, color='.4', style='italic')
 
     # Add padding between title and plots
@@ -337,7 +337,7 @@ def generate_faceted_barchart(counts_df, top_n=10):
     plt.close()
 
 if __name__ == "__main__":
-    counts_df = process_data(r"V:\Paper_rahel\Files\OverviewEnablerEntry.xlsx")
+    counts_df = process_data(r"C:\Users\rahelma\Documents\Elevate\EntryPointCode\version_0425\data\raw\OverviewEnablerEntry.xlsx")
     counts_df.to_csv("enabler_counts.csv", index=False)
     
     generate_faceted_barchart(counts_df)

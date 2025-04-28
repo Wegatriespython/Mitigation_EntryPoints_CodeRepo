@@ -19,7 +19,8 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Go up one level to the parent directory
 parent_dir = os.path.dirname(script_dir)
-INPUT_FILE = os.path.join(file_name)
+#INPUT_FILE = os.path.join(file_name)
+INPUT_FILE = os.path.join(parent_dir, "data", "raw", file_name)
 RF_RESULTS_FILE_PREFIX = "rf_analysis_resultsRE_132"
 HEATMAP_OUTPUT_PREFIX = "WindSolar3_Co_occurrence_heatmap_final_V2_2323"
 CLUSTER_COLUMN = "Cluster"
